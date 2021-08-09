@@ -1,0 +1,48 @@
+/*********************************************************
+Evaluacion 1 - Blackjack
+Kevin Fallas Alvarado 2019057752
+Esteban Madrigal Marin 2018154123
+
+La probabilidad del jugador obtenida es de: 
+**********************************************************/
+
+/*Funcion para sumar las cartas*/
+newcmd contar cartas suma       
+       copy cartas copiaCartas
+       recode copiaCartas > 10 10 copiaCartas
+       sum copiaCartas sumaTotal
+
+       if (1 memberof copiaCartas) and (sumaTotal + 10)<=21
+          suma = sumaTotal + 10
+       else
+          suma = sumaTotal
+       end
+end
+
+/*Estrategia del jugador para pedir cartas*/
+
+
+/*Estrategia de la casa para pedir cartas*/
+
+
+/*** Desarrollo de la simulaci�n ***/
+/*Se genera un "deck" de cartas*/
+copy 4#1,13 deck
+
+/*Se mezclan las cartas*/
+shuffle deck deck
+
+/*se reparten las cartas del jugador*/
+take deck (1 3) cartasJug
+/*se reparten las cartas de la casa*/
+take deck (2 4) cartasCasa
+/*se eliminan las cartas repartidas*/
+remove deck (1 2 3 4) deck
+print cartasJug cartasCasa deck
+/* estrategia del jugador */
+
+/* estrategia de la casa*/
+
+/*se determina el ganador*/
+
+/*se almacenan los resultados*/
