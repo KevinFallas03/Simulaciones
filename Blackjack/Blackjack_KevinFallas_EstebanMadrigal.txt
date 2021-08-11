@@ -1,0 +1,100 @@
+/*********************************************************
+Evaluacion 1 - Blackjack
+Kevin Fallas Alvarado 2019057752
+Esteban Madrigal Marin 2018154123
+
+La probabilidad del jugador obtenida es de: 0.4286
+**********************************************************/
+CLEAROUTPUT
+
+/*Funcion para sumar las cartas*/
+NEWCMD CONTAR_CARTAS cartas suma
+   COPY cartas copiaCartas
+   RECODE copiaCartas > 10 10 copiaCartas
+   SUM copiaCartas sumaTotal
+   IF (1 memberof copiaCartas) AND (sumaTotal + 10)<=21
+      suma = sumaTotal + 10
+   ELSE
+      suma = sumaTotal
+   END
+END
+
+/*Estrategia del jugador para pedir cartas*/
+NEWCMD PEDIR_CARTA_JUGADOR cartasJugador cartaVisibleCasa seguirPidiendoJug
+   CONTAR_CARTAS cartasJugador sumaTotal
+   seguirPidiendoJug = 0
+   IF sumaTotal between 4 11
+      seguirPidiendoJug = 1 'Hit
+   ELSEIF sumaTotal = 12 AND cartaVisibleCasa notbetween 4 6
+      seguirPidiendoJug = 1 'Hit
+   ELSEIF sumaTotal between 13 16 AND cartaVisibleCasa notbetween 2 6
+      seguirPidiendoJug = 1 'Hit
+   ELSE
+      seguirPidiendoJug = 0 'Stand
+   END
+END
+
+/*Estrategia de la casa para pedir cartas*/
+NEWCMD PEDIR_CARTA_CASA cartasCasa seguirPidiendoCasa
+   CONTAR_CARTAS cartasCasa sumaTotal
+   IF sumaTotal between 1 16
+      seguirPidiendoCasa = 1 'Hit
+   ELSE
+      seguirPidiendoCasa = 0 'Stand
+   END
+END
+
+/*** Desarrollo de la simulacion ***/
+numCiclos = 100000
+exitos = 0
+repeat numCiclos
+   /*Se genera un "deck" de cartas*/
+   COPY 4#1,13 deck
+   SHUFFLE deck deck 'Se mezclan las cartas
+   
+   /*se reparten las cartas del jugador*/
+   TAKE deck (1 3) cartasJug
+   /*se reparten las cartas de la casa*/
+   TAKE deck (2 4) cartasCasa
+   TAKE cartasCasa (2) cartaVisibleCasa 'para saber solo la carta visible de la casa
+   /*se eliminan las cartas repartidas*/
+   REMOVE deck (1 2 3 4) deck
+   
+   PRINT "\nCartas del jugador y cartas de la casa"
+   PRINT cartasJug cartasCasa
+   
+   /* estrategia del jugador */
+   PEDIR_CARTA_JUGADOR cartasJug cartaVisibleCasa siguePidiendoJug
+   WHILE siguePidiendoJug=1
+      TAKE deck (1) nuevaCartaJug
+      COPY cartasJug nuevaCartaJug cartasJug ' Incorpora la nueva carta en el mazo del jugador
+      REMOVE deck (1) deck
+      PEDIR_CARTA_JUGADOR cartasJug cartaVisibleCasa siguePidiendoJug
+   END
+   
+   /*Si el jugador se pasa de 21, la casa automáticamente gana el juego, sin tener que repartir cartas*/
+   CONTAR_CARTAS cartasJug sumaTotalJug
+   IF sumaTotalJug <= 21
+      /* estrategia de la casa*/
+      PEDIR_CARTA_CASA cartasCasa siguePidiendoCasa
+      WHILE siguePidiendoCasa=1
+         TAKE deck (1) nuevaCartaCasa
+         COPY cartasCasa nuevaCartaCasa cartasCasa ' Incorpora la nueva carta en el mazo del jugador
+         REMOVE deck (1) deck
+         PEDIR_CARTA_CASA cartasCasa siguePidiendoCasa
+      END
+      
+      /*se determina el ganador*/
+      CONTAR_CARTAS cartasCasa sumaTotalCasa
+      IF sumaTotalJug > sumaTotalCasa OR sumaTotalCasa > 21
+         exitos = exitos+1
+         PRINT "Gano el jugador"
+      ELSE
+         PRINT "Gano la casa"
+      END
+   ELSE
+      PRINT "Gano la casa"
+   END
+END
+probExito = exitos / numCiclos
+PRINT probExito
