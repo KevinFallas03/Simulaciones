@@ -6,6 +6,7 @@ Esteban Madrigal Marin 2018154123
 La probabilidad del jugador obtenida es de: 
 **********************************************************/
 CLEAROUTPUT
+
 /*Funcion para sumar las cartas*/
 NEWCMD CONTAR_CARTAS cartas suma
    COPY cartas copiaCartas
@@ -21,6 +22,7 @@ END
 /*Estrategia del jugador para pedir cartas*/
 NEWCMD PEDIR_CARTA_JUGADOR cartasJugador cartaVisibleCasa seguirPidiendo
    CONTAR_CARTAS cartasJugador sumaTotal
+   seguirPidiendo = 0
    IF sumaTotal between 4 11
       seguirPidiendo = 1 'Hit
    ELSEIF sumaTotal = 12 AND cartaVisibleCasa notbetween 4 6
@@ -33,20 +35,21 @@ NEWCMD PEDIR_CARTA_JUGADOR cartasJugador cartaVisibleCasa seguirPidiendo
 END
 
 /*Estrategia de la casa para pedir cartas*/
-NEWCMD PEDIR_CARTA_CASA cartasJugador seguirPidiendo
-   CONTAR_CARTAS cartasJugador sumaTotal
-   IF sumaTotal >= 17
-      seguirPidiendo = 0 'Stand
-   ELSE
+NEWCMD PEDIR_CARTA_CASA cartasCasa seguirPidiendo
+   CONTAR_CARTAS cartasCasa sumaTotal
+   IF sumaTotal between 1 16
       seguirPidiendo = 1 'Hit
+   ELSE
+      seguirPidiendo = 0 'Stand
    END
 END
 
 /*** Desarrollo de la simulacion ***/
-/*Se genera un "deck" de cartas*/
 numCiclos = 100000
 exitos = 0
+fracasos = 0
 repeat numCiclos
+   /*Se genera un "deck" de cartas*/
    COPY 4#1,13 deck
    SHUFFLE deck deck 'Se mezclan las cartas
    
@@ -58,37 +61,48 @@ repeat numCiclos
    /*se eliminan las cartas repartidas*/
    REMOVE deck (1 2 3 4) deck
    
-   PRINT "Cartas del jugador y cartas de la casa"
-   PRINT cartasJug cartasCasa
-   PRINT "--------------------------------------"
+   'PRINT "Cartas del jugador y cartas de la casa"
+   'PRINT cartasJug cartasCasa
+   'PRINT "--------------------------------------"
    
    /* estrategia del jugador */
-   PEDIR_CARTA_JUGADOR cartasJug cartaVisibleCasa siguePidiendo
-   WHILE siguePidiendo=1
+   PEDIR_CARTA_JUGADOR cartasJug cartaVisibleCasa siguePidiendoJug
+   WHILE siguePidiendoJug=1
       TAKE deck (1) nuevaCarta
       COPY cartasJug nuevaCarta cartasJug ' Incorpora la nueva carta en el mazo del jugador
       REMOVE deck (1) deck
-      PRINT cartasJug
-      PEDIR_CARTA_JUGADOR cartasJug cartaVisibleCasa siguePidiendo
-   END 
-   /* estrategia de la casa*/
-   PEDIR_CARTA_CASA cartasCasa siguePidiendo
-   WHILE siguePidiendo=1
-      TAKE deck (1) nuevaCarta
-      COPY cartasCasa nuevaCarta cartasCasa ' Incorpora la nueva carta en el mazo del jugador
-      REMOVE deck (1) deck
-      PRINT cartasCasa
-      PEDIR_CARTA_CASA cartasCasa siguePidiendo
+      'PRINT cartasJug
+      PEDIR_CARTA_JUGADOR cartasJug cartaVisibleCasa siguePidiendoJug
    END
-
-   /*se determina el ganador*/
+   
+   /*Si el jugador se pasa de 21, la casa automáticamente gana el juego, sin tener que repartir cartas*/
    CONTAR_CARTAS cartasJug sumaTotalJug
-   CONTAR_CARTAS cartasCasa sumaTotalCasa
-   IF sumaTotalJug > sumaTotalCasa and sumaTotalJug <= 21
-      exitos = exitos+1
-      PRINT "Gano el jugador"
+   IF sumaTotalJug > 21
+      fracasos = fracasos+1
+   ELSE
+      /* estrategia de la casa*/
+      PEDIR_CARTA_CASA cartasCasa siguePidiendoCasa
+      WHILE siguePidiendoCasa=1
+         TAKE deck (1) nuevaCarta
+         COPY cartasCasa nuevaCarta cartasCasa ' Incorpora la nueva carta en el mazo del jugador
+         REMOVE deck (1) deck
+         'PRINT cartasCasa
+         PEDIR_CARTA_CASA cartasCasa siguePidiendoCasa
+      END
+      
+      /*se determina el ganador*/
+      CONTAR_CARTAS cartasJug sumaTotalJug
+      CONTAR_CARTAS cartasCasa sumaTotalCasa
+      IF sumaTotalJug <= sumaTotalCasa AND sumaTotalCasa <= 21
+         /*se almacenan los resultados*/
+         fracasos = fracasos+1
+         'PRINT "Gano la casa"
+      ELSEIF sumaTotalJug > sumaTotalCasa AND sumaTotalJug <= 21
+         exitos = exitos+1
+         'PRINT "Gano el jugador"
+      END
    END
-   /*se almacenan los resultados*/
 END
-prob = exitos / numCiclos
-PRINT prob
+probExito = exitos / numCiclos
+probFraca = fracasos / numCiclos
+PRINT probExito probFraca
