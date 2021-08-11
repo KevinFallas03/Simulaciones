@@ -3,7 +3,7 @@ Evaluacion 1 - Blackjack
 Kevin Fallas Alvarado 2019057752
 Esteban Madrigal Marin 2018154123
 
-La probabilidad del jugador obtenida es de: 
+La probabilidad del jugador obtenida es de: 0.4286
 **********************************************************/
 CLEAROUTPUT
 
@@ -12,7 +12,7 @@ NEWCMD CONTAR_CARTAS cartas suma
    COPY cartas copiaCartas
    RECODE copiaCartas > 10 10 copiaCartas
    SUM copiaCartas sumaTotal
-   IF (1 memberof copiaCartas) and (sumaTotal + 10)<=21
+   IF (1 memberof copiaCartas) AND (sumaTotal + 10)<=21
       suma = sumaTotal + 10
    ELSE
       suma = sumaTotal
@@ -20,34 +20,33 @@ NEWCMD CONTAR_CARTAS cartas suma
 END
 
 /*Estrategia del jugador para pedir cartas*/
-NEWCMD PEDIR_CARTA_JUGADOR cartasJugador cartaVisibleCasa seguirPidiendo
+NEWCMD PEDIR_CARTA_JUGADOR cartasJugador cartaVisibleCasa seguirPidiendoJug
    CONTAR_CARTAS cartasJugador sumaTotal
-   seguirPidiendo = 0
+   seguirPidiendoJug = 0
    IF sumaTotal between 4 11
-      seguirPidiendo = 1 'Hit
+      seguirPidiendoJug = 1 'Hit
    ELSEIF sumaTotal = 12 AND cartaVisibleCasa notbetween 4 6
-      seguirPidiento = 1 'Hit
+      seguirPidiendoJug = 1 'Hit
    ELSEIF sumaTotal between 13 16 AND cartaVisibleCasa notbetween 2 6
-      seguirPidiendo = 1 'Hit
+      seguirPidiendoJug = 1 'Hit
    ELSE
-      seguirPidiendo = 0 'Stand
+      seguirPidiendoJug = 0 'Stand
    END
 END
 
 /*Estrategia de la casa para pedir cartas*/
-NEWCMD PEDIR_CARTA_CASA cartasCasa seguirPidiendo
+NEWCMD PEDIR_CARTA_CASA cartasCasa seguirPidiendoCasa
    CONTAR_CARTAS cartasCasa sumaTotal
    IF sumaTotal between 1 16
-      seguirPidiendo = 1 'Hit
+      seguirPidiendoCasa = 1 'Hit
    ELSE
-      seguirPidiendo = 0 'Stand
+      seguirPidiendoCasa = 0 'Stand
    END
 END
 
 /*** Desarrollo de la simulacion ***/
 numCiclos = 100000
 exitos = 0
-fracasos = 0
 repeat numCiclos
    /*Se genera un "deck" de cartas*/
    COPY 4#1,13 deck
@@ -61,48 +60,49 @@ repeat numCiclos
    /*se eliminan las cartas repartidas*/
    REMOVE deck (1 2 3 4) deck
    
-   'PRINT "Cartas del jugador y cartas de la casa"
-   'PRINT cartasJug cartasCasa
-   'PRINT "--------------------------------------"
+   PRINT "\nCartas del jugador y cartas de la casa"
+   PRINT cartasJug cartasCasa
    
    /* estrategia del jugador */
    PEDIR_CARTA_JUGADOR cartasJug cartaVisibleCasa siguePidiendoJug
    WHILE siguePidiendoJug=1
-      TAKE deck (1) nuevaCarta
-      COPY cartasJug nuevaCarta cartasJug ' Incorpora la nueva carta en el mazo del jugador
+      TAKE deck (1) nuevaCartaJug
+      COPY cartasJug nuevaCartaJug cartasJug ' Incorpora la nueva carta en el mazo del jugador
       REMOVE deck (1) deck
-      'PRINT cartasJug
       PEDIR_CARTA_JUGADOR cartasJug cartaVisibleCasa siguePidiendoJug
    END
    
    /*Si el jugador se pasa de 21, la casa automáticamente gana el juego, sin tener que repartir cartas*/
    CONTAR_CARTAS cartasJug sumaTotalJug
-   IF sumaTotalJug > 21
-      fracasos = fracasos+1
-   ELSE
+   IF sumaTotalJug <= 21
       /* estrategia de la casa*/
       PEDIR_CARTA_CASA cartasCasa siguePidiendoCasa
       WHILE siguePidiendoCasa=1
-         TAKE deck (1) nuevaCarta
-         COPY cartasCasa nuevaCarta cartasCasa ' Incorpora la nueva carta en el mazo del jugador
+         TAKE deck (1) nuevaCartaCasa
+         COPY cartasCasa nuevaCartaCasa cartasCasa ' Incorpora la nueva carta en el mazo del jugador
          REMOVE deck (1) deck
-         'PRINT cartasCasa
          PEDIR_CARTA_CASA cartasCasa siguePidiendoCasa
       END
       
       /*se determina el ganador*/
-      CONTAR_CARTAS cartasJug sumaTotalJug
       CONTAR_CARTAS cartasCasa sumaTotalCasa
-      IF sumaTotalJug <= sumaTotalCasa AND sumaTotalCasa <= 21
-         /*se almacenan los resultados*/
-         fracasos = fracasos+1
-         'PRINT "Gano la casa"
-      ELSEIF sumaTotalJug > sumaTotalCasa AND sumaTotalJug <= 21
+      IF sumaTotalJug > sumaTotalCasa OR sumaTotalCasa > 21
          exitos = exitos+1
-         'PRINT "Gano el jugador"
+         PRINT "Gano el jugador"
+      ELSE
+         PRINT "Gano la casa"
       END
+   ELSE
+      PRINT "Gano la casa"
    END
 END
 probExito = exitos / numCiclos
-probFraca = fracasos / numCiclos
-PRINT probExito probFraca
+PRINT probExito
+
+
+
+
+
+
+
+
