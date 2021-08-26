@@ -28,14 +28,16 @@ NEWCMD EXPLOTAR dec num lista
    TAKE res 1, dec lista
 END
 
-NEWCMD GET_LISTA n res
+NEWCMD GET_LISTA res
    LET dec = 0
    INPUT "Cantidad de decimales: " dec
    READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Huecos con Digitos\\91 Ejemplo n=30.txt" INPUT
    c = 1
    res = ()
+   SIZE INPUT n
    REPEAT n
       TAKE INPUT c num
+      print num
       EXPLOTAR dec num lista
       CONCAT res lista res
       c = c+1
@@ -105,8 +107,7 @@ NEWCMD DESCARTAR_FO cantidad_fe lista_fo lista_fo_actualizada
 END
 
 /*Main*/
-INPUT "Tamaño de n: " n
-GET_LISTA n lista
+GET_LISTA lista
 OBTENER_FO lista sumatoria_fo
 SIZE lista_fo cantidad_fo
 GET_FRECUENCIA_ESPERADA cantidad_fo sumatoria_fo lista_fe
