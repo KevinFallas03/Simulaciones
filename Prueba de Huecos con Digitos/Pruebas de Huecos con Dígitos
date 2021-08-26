@@ -3,7 +3,8 @@ Evaluacion 2 - Pruebas de Huecos con Dígitos
 Kevin Fallas Alvarado 2019057752
 Esteban Madrigal Marin 2018154123
 
-Chi Cuadrado es de: 5.180547891615725
+Chi Cuadrado prueba "91 Ejemplo n=30" con 4 decimales es de: 5.180547891615725
+Chi Cuadrado prueba "92 Ejemplo n=1000" con 4 decimales es de: 33.54025725729156
 **********************************************************/
 
 CLEAROUTPUT
