@@ -1,0 +1,141 @@
+INCLUDE "/lib/searchCommands.txt"
+clearoutput
+
+global huecos
+huecos = ()
+
+NEWCMD EXPLOTAR dec num res
+   decMasUno = dec + 1
+   res = ()
+   t = num * 10^decMasUno
+   integer truncate t t
+   numCiclos = decMasUno
+   REPEAT numCiclos
+      rem = t % 10
+      quo = t / 10
+      integer truncate quo quo
+      t = quo
+      concat rem res res
+   END
+   take res 1, dec lista
+END
+
+NEWCMD GETLISTA n res
+   READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Huecos con Digitos\\91 Ejemplo de clase n=30 Huecos con Digitos-1.txt" input
+    'READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Huecos con Digitos\\92 Ejemplo de prueba n=1000.txt" input    
+   c = 1
+   res = ()
+   REPEAT n
+      TAKE input c num
+      EXPLOTAR 3 num lista
+      CONCAT res lista res
+      c = c+1
+   END
+END
+
+NEWCMD ACTUALIZARHUECOS tamannoHueco
+   tamannoMasUno = tamannoHueco+1
+   SIZE huecos cant
+   IF cant = 0 OR tamannoMasUno > cant
+      put 1 tamannoMasUno huecos
+   else
+      TAKE huecos tamannoMasUno num1
+      if num1 = NaN
+         put 1 tamannoMasUno huecos
+      else
+         suma = num1+1
+         PUT suma tamannoMasUno huecos
+      end
+   END
+END
+
+NEWCMD CONTARHUECOS lista sumatoria
+   digito = 0
+   sumatoria = 0
+   SIZE lista cant
+   while digito <= 9
+      sumando = false
+      indice = 1
+      tamannoHueco = 0
+      while indice <= cant
+         TAKE lista indice num1
+         if num1 = digito
+            if sumando
+               sumatoria = sumatoria+1
+               ACTUALIZARHUECOS tamannoHueco
+               tamannoHueco = 0
+            else
+               sumando = not sumando
+            END
+         elseif sumando
+            tamannoHueco = tamannoHueco+1
+         end
+         indice = indice+1
+      end
+      digito = digito+1
+   end
+END
+
+NEWCMD CONTARHUECOS2 lista sumatoria
+   digito = 0
+   sumatoria = 0
+   SIZE lista cant
+   while digito <= 9
+      sumando = false
+      indice = 1
+      indice1 = 0
+      while indice <= cant
+         TAKE lista indice num1
+         if num1 = digito
+            if sumando
+               sumatoria = sumatoria+1
+               tamannoHueco = indice - (indice1 + 1)
+               ACTUALIZARHUECOS tamannoHueco
+            else
+               sumando = true
+            END
+            indice1 = indice
+         end
+         indice = indice+1
+      end
+      digito = digito+1
+   end
+END
+
+'GETLISTA 30 lista
+lista = (4.0 2.0 3.0 7.0 \
+0.0 2.0 9.0 0.0 \
+7.0 6.0 5.0 5.0 \
+4.0 8.0 4.0 9.0 \
+5.0 8.0 6.0 3.0 \
+2.0 4.0 0.0 3.0 \
+8.0 8.0 3.0 1.0 \
+7.0 3.0 3.0 0.0 \
+2.0 2.0 1.0 5.0 \
+0.0 7.0 4.0 1.0 \
+6.0 0.0 0.0 0.0 \
+0.0 3.0 3.0 7.0 \
+5.0 2.0 3.0 7.0 \
+3.0 9.0 6.0 1.0 \
+8.0 1.0 6.0 9.0 \
+7.0 8.0 3.0 7.0 \
+8.0 1.0 0.0 5.0 \
+0.0 2.0 1.0 5.0 \
+9.0 2.0 5.0 7.0 \
+8.0 7.0 9.0 4.0 \
+5.0 2.0 8.0 1.0 \
+5.0 3.0 1.0 4.0 \
+2.0 6.0 6.0 6.0 \
+5.0 4.0 9.0 4.0 \
+6.0 5.0 5.0 4.0 \
+4.0 0.0 1.0 6.0 \
+9.0 7.0 2.0 6.0 \
+9.0 6.0 5.0 7.0 \
+3.0 0.0 6.0 3.0 \
+0.0 2.0 2.0 2.0)
+CONTARHUECOS2 lista fo
+
+print huecos
+
+chisquare Fo Fe chiSquareResult.
+
