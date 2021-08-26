@@ -1,115 +1,94 @@
+/*********************************************************
+Evaluacion 2 - Pruebas de Huecos con Dígitos
+Kevin Fallas Alvarado 2019057752
+Esteban Madrigal Marin 2018154123
+
+Chi Cuadrado es de: 5.180547891615725
+**********************************************************/
+
 INCLUDE "/lib/searchCommands.txt"
-clearoutput
+CLEAROUTPUT
 
-global huecos
-huecos = ()
+GLOBAL lista_fo
+lista_fo = ()
 
+/*Cargar (read) un archivo de datos.*/
 NEWCMD EXPLOTAR dec num res
    decMasUno = dec + 1
    res = ()
    t = num * 10^decMasUno
-   integer truncate t t
+   INTEGER TRUNCATE t t
    numCiclos = decMasUno
    REPEAT numCiclos
       rem = t % 10
       quo = t / 10
-      integer truncate quo quo
+      INTEGER TRUNCATE quo quo
       t = quo
-      concat rem res res
+      CONCAT rem res res
    END
-   take res 1, dec lista
+   TAKE res 1, dec lista
 END
 
-/*
-Cargar (read) un archivo de datos.
-*/
-NEWCMD GETLISTA n res
+NEWCMD GET_LISTA n res
    READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Huecos con Digitos\\91 Ejemplo de clase n=30 Huecos con Digitos-1.txt" input
-    'READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Huecos con Digitos\\92 Ejemplo de prueba n=1000.txt" input    
    c = 1
    res = ()
    REPEAT n
-      TAKE input c num
+      TAKE INPUT c num
       EXPLOTAR 3 num lista
       CONCAT res lista res
       c = c+1
    END
 END
 
-NEWCMD ACTUALIZARHUECOS tamannoHueco
+/*Calcular los elementos de la prueba*/
+NEWCMD  ACTUALIZAR_FO tamannoHueco
    tamannoMasUno = tamannoHueco+1
-   SIZE huecos cant
+   SIZE  lista_fo cant
    IF cant = 0 OR tamannoMasUno > cant
-      put 1 tamannoMasUno huecos
-   else
-      TAKE huecos tamannoMasUno num1
-      if num1 = NaN
-         put 1 tamannoMasUno huecos
-      else
+      PUT 1 tamannoMasUno  lista_fo
+   ELSE
+      TAKE  lista_fo tamannoMasUno num1
+      IF num1 = NaN
+         PUT 1 tamannoMasUno  lista_fo
+      ELSE
          suma = num1+1
-         PUT suma tamannoMasUno huecos
-      end
+         PUT suma tamannoMasUno  lista_fo
+      END
    END
 END
 
-NEWCMD CONTARHUECOS lista sumatoria
+NEWCMD OBTENER_FO lista sumatoria
    digito = 0
    sumatoria = 0
    SIZE lista cant
-   while digito <= 9
-      sumando = false
-      indice = 1
-      tamannoHueco = 0
-      while indice <= cant
-         TAKE lista indice num1
-         if num1 = digito
-            if sumando
-               sumatoria = sumatoria+1
-               ACTUALIZARHUECOS tamannoHueco
-               tamannoHueco = 0
-            else
-               sumando = not sumando
-            END
-         elseif sumando
-            tamannoHueco = tamannoHueco+1
-         end
-         indice = indice+1
-      end
-      digito = digito+1
-   end
-END
-
-NEWCMD CONTARHUECOS2 lista sumatoria
-   digito = 0
-   sumatoria = 0
-   SIZE lista cant
-   while digito <= 9
+   WHILE digito <= 9
       sumando = false
       indice = 1
       indice1 = 0
-      while indice <= cant
+      WHILE indice <= cant
          TAKE lista indice num1
-         if num1 = digito
-            if sumando
+         IF num1 = digito
+            IF sumando
                sumatoria = sumatoria+1
                tamannoHueco = indice - (indice1 + 1)
-               ACTUALIZARHUECOS tamannoHueco
-            else
+               ACTUALIZAR_FO tamannoHueco
+            ELSE
                sumando = true
             END
             indice1 = indice
-         end
+         END
          indice = indice+1
-      end
+      END
       digito = digito+1
-   end
+   END
 END
 
-NEWCMD GET_FRECUENCIA_ESPERADA x totalHuecos lista_fe
+NEWCMD GET_FRECUENCIA_ESPERADA x total_fo lista_fe
    contador = 0
    WHILE contador <= x
       probabilidad = 0.1*(0.9)^contador
-      fe = probabilidad * totalHuecos
+      fe = probabilidad * total_fo
       contador = contador + 1
       PUT fe contador lista_fe
    END
@@ -124,15 +103,8 @@ NEWCMD DESCARTAR_FO cantidad_fe lista_fo lista_fo_actualizada
     TAKE lista_fo 1,cantidad_fe lista_fo_actualizada
 END
 
-GET_FRECUENCIA_ESPERADA 10 110 lista_fe
-print lista_fe
-DESCARTAR_FE lista_fe lista_fe_actualizada
-print lista_fe_actualizada
-
-
-
-
-'GETLISTA 30 lista
+/*Main*/
+'GET_LISTA 30 lista
 lista = (4.0 2.0 3.0 7.0 \
   0.0 2.0 9.0 0.0 \
   7.0 6.0 5.0 5.0 \
@@ -164,12 +136,19 @@ lista = (4.0 2.0 3.0 7.0 \
   3.0 0.0 6.0 3.0 \
   0.0 2.0 2.0 2.0)
 
-CONTARHUECOS lista sumatoria_fo
+OBTENER_FO lista sumatoria_fo
 GET_FRECUENCIA_ESPERADA 10 sumatoria_fo lista_fe
 DESCARTAR_FE lista_fe lista_fe_actualizada
 SIZE lista_fe_actualizada cantidad_fe
-DESCARTAR_FO cantidad_fe huecos huecos_actualizados 
+DESCARTAR_FO cantidad_fe lista_fo lista_fo_actualizada
 
-chisquare huecos_actualizados lista_fe_actualizada chiSquareResult
-print chiSquareResult
+/*Mostrar (print) la tabla de frecuencias observadas y frecuencias esperadas*/ 
+newBin = 0,7
+newFo = lista_fo_actualizada
+newFe = lista_fe_actualizada
+PRINT TABLE newBin newFo newFe
+PRINT
+/*Dar (print) el valor de ji cuadrado subcero*/
+CHISQUARE  lista_fo_actualizada lista_fe_actualizada chiSquareResult
+PRINT chiSquareResult
 
