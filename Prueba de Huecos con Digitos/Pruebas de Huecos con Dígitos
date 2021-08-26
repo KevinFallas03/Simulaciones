@@ -31,12 +31,12 @@ END
 NEWCMD GET_LISTA res
    LET dec = 0
    INPUT "Cantidad de decimales: " dec
-   READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Huecos con Digitos\\91 Ejemplo n=30.txt" INPUT
+   READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Huecos con Digitos\\91 Ejemplo n=30.txt" lista_numeros
    c = 1
    res = ()
-   SIZE INPUT n
+   SIZE lista_numeros n
    REPEAT n
-      TAKE INPUT c num
+      TAKE lista_numeros c num
       print num
       EXPLOTAR dec num lista
       CONCAT res lista res
