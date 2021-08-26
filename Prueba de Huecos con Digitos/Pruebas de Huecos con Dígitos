@@ -6,14 +6,13 @@ Esteban Madrigal Marin 2018154123
 Chi Cuadrado es de: 5.180547891615725
 **********************************************************/
 
-INCLUDE "/lib/searchCommands.txt"
 CLEAROUTPUT
 
 GLOBAL lista_fo
 lista_fo = ()
 
 /*Cargar (read) un archivo de datos.*/
-NEWCMD EXPLOTAR dec num res
+NEWCMD EXPLOTAR dec num lista
    decMasUno = dec + 1
    res = ()
    t = num * 10^decMasUno
@@ -30,12 +29,14 @@ NEWCMD EXPLOTAR dec num res
 END
 
 NEWCMD GET_LISTA n res
-   READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Huecos con Digitos\\91 Ejemplo de clase n=30 Huecos con Digitos-1.txt" input
+   LET dec = 0
+   INPUT "Cantidad de decimales: " dec
+   READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Huecos con Digitos\\91 Ejemplo n=30.txt" INPUT
    c = 1
    res = ()
    REPEAT n
       TAKE INPUT c num
-      EXPLOTAR 3 num lista
+      EXPLOTAR dec num lista
       CONCAT res lista res
       c = c+1
    END
@@ -95,7 +96,7 @@ NEWCMD GET_FRECUENCIA_ESPERADA x total_fo lista_fe
 END
 
 NEWCMD DESCARTAR_FE lista_fe lista_fe_actualizada
-    COUNT lista_fe > 5 resultado
+    COUNT lista_fe >= 5 resultado
     TAKE lista_fe 1,resultado lista_fe_actualizada
 END
 
@@ -104,49 +105,21 @@ NEWCMD DESCARTAR_FO cantidad_fe lista_fo lista_fo_actualizada
 END
 
 /*Main*/
-'GET_LISTA 30 lista
-lista = (4.0 2.0 3.0 7.0 \
-  0.0 2.0 9.0 0.0 \
-  7.0 6.0 5.0 5.0 \
-  4.0 8.0 4.0 9.0 \
-  5.0 8.0 6.0 3.0 \
-  2.0 4.0 0.0 3.0 \
-  8.0 8.0 3.0 1.0 \
-  7.0 3.0 3.0 0.0 \
-  2.0 2.0 1.0 5.0 \
-  0.0 7.0 4.0 1.0 \
-  6.0 0.0 0.0 0.0 \
-  0.0 3.0 3.0 7.0 \
-  5.0 2.0 3.0 7.0 \
-  3.0 9.0 6.0 1.0 \
-  8.0 1.0 6.0 9.0 \
-  7.0 8.0 3.0 7.0 \
-  8.0 1.0 0.0 5.0 \
-  0.0 2.0 1.0 5.0 \
-  9.0 2.0 5.0 7.0 \
-  8.0 7.0 9.0 4.0 \
-  5.0 2.0 8.0 1.0 \
-  5.0 3.0 1.0 4.0 \
-  2.0 6.0 6.0 6.0 \
-  5.0 4.0 9.0 4.0 \
-  6.0 5.0 5.0 4.0 \
-  4.0 0.0 1.0 6.0 \
-  9.0 7.0 2.0 6.0 \
-  9.0 6.0 5.0 7.0 \
-  3.0 0.0 6.0 3.0 \
-  0.0 2.0 2.0 2.0)
-
+INPUT "Tamaño de n: " n
+GET_LISTA n lista
 OBTENER_FO lista sumatoria_fo
-GET_FRECUENCIA_ESPERADA 10 sumatoria_fo lista_fe
+SIZE lista_fo cantidad_fo
+GET_FRECUENCIA_ESPERADA cantidad_fo sumatoria_fo lista_fe
 DESCARTAR_FE lista_fe lista_fe_actualizada
 SIZE lista_fe_actualizada cantidad_fe
 DESCARTAR_FO cantidad_fe lista_fo lista_fo_actualizada
 
 /*Mostrar (print) la tabla de frecuencias observadas y frecuencias esperadas*/ 
-newBin = 0,7
+cantidad_fe_menos_uno = cantidad_fe - 1
+newBin = 0,cantidad_fe_menos_uno
 newFo = lista_fo_actualizada
 newFe = lista_fe_actualizada
-PRINT TABLE newBin newFo newFe
+PRINT TABLE newBin%2.0F newFo newFe
 PRINT
 /*Dar (print) el valor de ji cuadrado subcero*/
 CHISQUARE  lista_fo_actualizada lista_fe_actualizada chiSquareResult
