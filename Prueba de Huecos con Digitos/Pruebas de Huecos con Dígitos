@@ -20,6 +20,9 @@ NEWCMD EXPLOTAR dec num res
    take res 1, dec lista
 END
 
+/*
+Cargar (read) un archivo de datos.
+*/
 NEWCMD GETLISTA n res
    READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Huecos con Digitos\\91 Ejemplo de clase n=30 Huecos con Digitos-1.txt" input
     'READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Huecos con Digitos\\92 Ejemplo de prueba n=1000.txt" input    
@@ -109,12 +112,24 @@ NEWCMD GET_FRECUENCIA_ESPERADA x totalHuecos lista_fe
       fe = probabilidad * totalHuecos
       contador = contador + 1
       PUT fe contador lista_fe
-      
    END
+END
+
+NEWCMD DESCARTAR_FE lista_fe lista_fe_actualizada
+    COUNT lista_fe > 5 resultado
+    TAKE lista_fe 1,resultado lista_fe_actualizada
+END
+
+NEWCMD DESCARTAR_FO cantidad_fe lista_fo lista_fo_actualizada
+    TAKE lista_fo 1,cantidad_fe lista_fo_actualizada
 END
 
 GET_FRECUENCIA_ESPERADA 10 110 lista_fe
 print lista_fe
+DESCARTAR_FE lista_fe lista_fe_actualizada
+print lista_fe_actualizada
+
+
 
 
 'GETLISTA 30 lista
@@ -148,9 +163,13 @@ lista = (4.0 2.0 3.0 7.0 \
   9.0 6.0 5.0 7.0 \
   3.0 0.0 6.0 3.0 \
   0.0 2.0 2.0 2.0)
-CONTARHUECOS2 lista fo
 
-print huecos
+CONTARHUECOS lista sumatoria_fo
+GET_FRECUENCIA_ESPERADA 10 sumatoria_fo lista_fe
+DESCARTAR_FE lista_fe lista_fe_actualizada
+SIZE lista_fe_actualizada cantidad_fe
+DESCARTAR_FO cantidad_fe huecos huecos_actualizados 
 
-'chisquare Fo Fe chiSquareResult
+chisquare huecos_actualizados lista_fe_actualizada chiSquareResult
+print chiSquareResult
 
