@@ -1,0 +1,128 @@
+/*********************************************************
+Evaluacion 2 - Pruebas de Huecos con Dígitos
+Kevin Fallas Alvarado 2019057752
+Esteban Madrigal Marin 2018154123
+
+Chi Cuadrado prueba "91 Ejemplo n=30" con 4 decimales es de: 5.180547891615725
+Chi Cuadrado prueba "92 Ejemplo n=1000" con 4 decimales es de: 33.54025725729156
+**********************************************************/
+
+CLEAROUTPUT
+
+GLOBAL lista_fo
+lista_fo = ()
+
+/*Cargar (read) un archivo de datos.*/
+NEWCMD EXPLOTAR dec num lista
+   decMasUno = dec + 1
+   res = ()
+   t = num * 10^decMasUno
+   INTEGER TRUNCATE t t
+   numCiclos = decMasUno
+   REPEAT numCiclos
+      rem = t % 10
+      quo = t / 10
+      INTEGER TRUNCATE quo quo
+      t = quo
+      CONCAT rem res res
+   END
+   TAKE res 1, dec lista
+END
+
+NEWCMD GET_LISTA res
+   LET dec = 0
+   INPUT "Cantidad de decimales: " dec
+   READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Huecos con Digitos\\92 Ejemplo n=1000.txt" lista_numeros
+   c = 1
+   res = ()
+   SIZE lista_numeros n
+   REPEAT n
+      TAKE lista_numeros c num
+      EXPLOTAR dec num lista
+      CONCAT res lista res
+      c = c+1
+   END
+END
+
+/*Calcular los elementos de la prueba*/
+NEWCMD  ACTUALIZAR_FO tamannoHueco
+   tamannoMasUno = tamannoHueco+1
+   SIZE  lista_fo cant
+   IF cant = 0 OR tamannoMasUno > cant
+      PUT 1 tamannoMasUno  lista_fo
+   ELSE
+      TAKE  lista_fo tamannoMasUno num1
+      IF num1 = NaN
+         PUT 1 tamannoMasUno  lista_fo
+      ELSE
+         suma = num1+1
+         PUT suma tamannoMasUno  lista_fo
+      END
+   END
+END
+
+NEWCMD OBTENER_FO lista sumatoria
+   digito = 0
+   sumatoria = 0
+   SIZE lista cant
+   WHILE digito <= 9
+      sumando = false
+      indice = 1
+      indice1 = 0
+      WHILE indice <= cant
+         TAKE lista indice num1
+         IF num1 = digito
+            IF sumando
+               sumatoria = sumatoria+1
+               tamannoHueco = indice - (indice1 + 1)
+               ACTUALIZAR_FO tamannoHueco
+            ELSE
+               sumando = true
+            END
+            indice1 = indice
+         END
+         indice = indice+1
+      END
+      digito = digito+1
+   END
+END
+
+NEWCMD GET_FRECUENCIA_ESPERADA x total_fo lista_fe
+   contador = 0
+   WHILE contador <= x
+      probabilidad = 0.1*(0.9)^contador
+      fe = probabilidad * total_fo
+      contador = contador + 1
+      PUT fe contador lista_fe
+   END
+END
+
+NEWCMD DESCARTAR_FE lista_fe lista_fe_actualizada
+    COUNT lista_fe >= 5 resultado
+    TAKE lista_fe 1,resultado lista_fe_actualizada
+END
+
+NEWCMD DESCARTAR_FO cantidad_fe lista_fo lista_fo_actualizada
+    TAKE lista_fo 1,cantidad_fe lista_fo_actualizada
+END
+
+/*Main*/
+GET_LISTA lista
+OBTENER_FO lista sumatoria_fo
+SIZE lista_fo cantidad_fo
+GET_FRECUENCIA_ESPERADA cantidad_fo sumatoria_fo lista_fe
+DESCARTAR_FE lista_fe lista_fe_actualizada
+SIZE lista_fe_actualizada cantidad_fe
+DESCARTAR_FO cantidad_fe lista_fo lista_fo_actualizada
+
+/*Mostrar (print) la tabla de frecuencias observadas y frecuencias esperadas*/ 
+cantidad_fe_menos_uno = cantidad_fe - 1
+newBin = 0,cantidad_fe_menos_uno
+newFo = lista_fo_actualizada
+newFe = lista_fe_actualizada
+PRINT TABLE newBin%2.0F newFo newFe
+PRINT
+/*Dar (print) el valor de ji cuadrado subcero*/
+CHISQUARE  lista_fo_actualizada lista_fe_actualizada chiSquareResult
+PRINT chiSquareResult
+
