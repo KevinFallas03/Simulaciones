@@ -1,0 +1,74 @@
+/*********************************************************
+Evaluacion 3 - Prueba de Poker
+Kevin Fallas Alvarado 2019057752
+Esteban Madrigal Marin 2018154123
+
+Chi Cuadrado prueba "91 Ejemplo n=30" con 5 decimales es de: 
+Chi Cuadrado prueba "92 Ejemplo n=1000" con 5 decimales es de: 
+**********************************************************/
+
+CLEAROUTPUT
+
+GLOBAL lista_fo
+lista_fo = ()
+
+/*Cargar (read) un archivo de datos.*/
+NEWCMD EXPLOTAR dec num lista
+   decMasUno = dec + 1
+   res = ()
+   t = num * 10^decMasUno
+   INTEGER TRUNCATE t t
+   numCiclos = decMasUno
+   REPEAT numCiclos
+      rem = t % 10
+      quo = t / 10
+      INTEGER TRUNCATE quo quo
+      t = quo
+      CONCAT rem res res
+   END
+   TAKE res 1, dec lista
+END
+
+NEWCMD GET_LISTA res
+   LET dec = 0
+   INPUT "Cantidad de decimales: " dec
+   READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Poker\\92 Ejemplo n=1000.txt" lista_numeros
+   c = 1
+   res = ()
+   SIZE lista_numeros n
+   REPEAT n
+      TAKE lista_numeros c num
+      EXPLOTAR dec num lista
+      CONCAT res lista res
+      c = c+1
+   END
+END
+
+/*Calcular las fo*/
+NEW GET_FRECUENCIA_OBSERVADA
+END
+
+/*
+NEWCMD GET_FRECUENCIA_ESPERADA
+   
+END
+*/
+
+/* Main */
+
+GET_LISTA lista
+
+/*Mostrar (print) la tabla de frecuencias observadas y frecuencias esperadas*/ 
+
+cantidad_fe_menos_uno = cantidad_fe - 1
+newBin = 0, cantidad_fe_menos_uno
+newFo = lista_fo_actualizada
+newFe = lista_fe_actualizada
+PRINT TABLE newBin%2.0F newFo newFe
+PRINT
+
+/*Dar (print) el valor de ji cuadrado subcero*/
+
+CHISQUARE  lista_fo_actualizada lista_fe_actualizada chiSquareResult
+PRINT chiSquareResult
+
