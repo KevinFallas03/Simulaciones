@@ -10,7 +10,58 @@ Chi Cuadrado prueba "92 Ejemplo n=1000" con 5 decimales es de:
 CLEAROUTPUT
 
 GLOBAL lista_fo
-lista_fo = ()
+lista_fo = (0 0 0 0 0 0 0)
+/*
+NEWCMD CLASIFICAR num id
+   MULTIPLES num > 1 id
+   IF id = 0
+      id = 7
+   ELSEIF id <> 1 
+      MULTIPLES num > 2 trioCount
+      id = 5 + trioCount
+   END
+END
+*/
+NEWCMD CLASIFICAR hand category
+   /* Códigos de las clasificaciones: 
+   1 - Quintilla
+   2 - Poker
+   3 - Tercia
+   4 - Un par
+   5 - Dos pares
+   6 - Full
+   7 - Todos diferentes
+   */
+   MULTIPLES hand > 1 multipleCount /*Cuenta grupos de iguales */
+   IF multipleCount = 0 /* Si no hay grupos, son todas diferentes*/
+      category = 7
+   ELSEIF multipleCount = 1 /*Si hay un grupo, puede ser quintilla, poker, tercia o un par */
+      MULTIPLES hand > 0 category /*Cuenta cantidad de digitos unicos, la cantidad corresponde al código de clasificación*/
+   ELSE /* Si hay dos grupos, puede ser Full o dos pares*/
+      MULTIPLES hand > 2 trioCount /*Cuenta grupos de tres */
+      category = 5 + trioCount /*Si hay un grupo de tres, es Full, sino es dos pares*/
+   END
+END
+
+/*Calcular las fo*/
+NEWCMD GET_FRECUENCIA_OBSERVADA lista_numeros
+      CLASIFICAR lista_numeros category
+      IF category = 7
+         ADD (1 0) lista_fo lista_fo
+      ELSEIF category = 4
+         ADD (0 1 0) lista_fo lista_fo
+      ELSEIF category = 5
+         ADD (0 0 1 0) lista_fo lista_fo
+      ELSEIF category = 3
+         ADD (0 0 0 1 0) lista_fo lista_fo
+      ELSEIF category = 6
+         ADD (0 0 0 0 1 0) lista_fo lista_fo
+      ELSEIF category = 2
+         ADD (0 0 0 0 0 1 0) lista_fo lista_fo
+      ELSE
+         ADD (0 0 0 0 0 0 1) lista_fo lista_fo
+      END
+END
 
 /*Cargar (read) un archivo de datos.*/
 NEWCMD EXPLOTAR dec num lista
@@ -29,25 +80,19 @@ NEWCMD EXPLOTAR dec num lista
    TAKE res 1, dec lista
 END
 
-NEWCMD GET_LISTA res
-   LET dec = 0
-   INPUT "Cantidad de decimales: " dec
-   READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Poker\\92 Ejemplo n=1000.txt" lista_numeros
+NEWCMD GET_LISTA
+   LET dec = 5
+   READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Poker\\91 Ejemplo Poker Clase n=30.txt" lista_numeros
+   print lista_numeros
    c = 1
-   res = ()
    SIZE lista_numeros n
    REPEAT n
       TAKE lista_numeros c num
       EXPLOTAR dec num lista
-      CONCAT res lista res
+      GET_FRECUENCIA_OBSERVADA lista
       c = c+1
    END
 END
-
-/*Calcular las fo*/
-NEW GET_FRECUENCIA_OBSERVADA
-END
-
 /*
 NEWCMD GET_FRECUENCIA_ESPERADA
    
@@ -56,10 +101,12 @@ END
 
 /* Main */
 
-GET_LISTA lista
-
-/*Mostrar (print) la tabla de frecuencias observadas y frecuencias esperadas*/ 
-
+GET_LISTA 
+print lista_fo
+multiples (2 2 9 6 3) > 0 m
+print m
+/*Mostrar (print) la tabla de frecuencias observadas y frecuencias esperadas*/
+/*
 cantidad_fe_menos_uno = cantidad_fe - 1
 newBin = 0, cantidad_fe_menos_uno
 newFo = lista_fo_actualizada
@@ -67,8 +114,7 @@ newFe = lista_fe_actualizada
 PRINT TABLE newBin%2.0F newFo newFe
 PRINT
 
-/*Dar (print) el valor de ji cuadrado subcero*/
 
 CHISQUARE  lista_fo_actualizada lista_fe_actualizada chiSquareResult
 PRINT chiSquareResult
-
+*/
