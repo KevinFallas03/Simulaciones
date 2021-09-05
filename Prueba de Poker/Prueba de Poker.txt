@@ -9,7 +9,10 @@ Chi Cuadrado prueba "92 Ejemplo n=1000" con 5 decimales es de:
 
 CLEAROUTPUT
 
+CONST 5 cantidad_decimales
+GLOBAL cantidad_decimales
 GLOBAL lista_fo
+
 lista_fo = (0 0 0 0 0 0 0)
 /*
 NEWCMD CLASIFICAR num id
@@ -81,18 +84,16 @@ NEWCMD EXPLOTAR dec num lista
 END
 
 NEWCMD GET_LISTA
-   LET dec = 5
-   READ file "D:\\TEC\\2021\\S2\\Simulacion\\Simulaciones\\Prueba de Poker\\91 Ejemplo Poker Clase n=30.txt" lista_numeros
+   READ "D:\\Documentos\\Ing en Computacion\\Semestre Vl\\Simulación\\Evaluaciones\\Simulaciones\\Prueba de Poker" lista_numeros
    print lista_numeros
-   c = 1
    SIZE lista_numeros n
-   REPEAT n
-      TAKE lista_numeros c num
-      EXPLOTAR dec num lista
+   FOREACH mazo lista_numeros
+      EXPLOTAR cantidad_decimales mazo lista
+      print lista
       GET_FRECUENCIA_OBSERVADA lista
-      c = c+1
    END
 END
+
 /*
 NEWCMD GET_FRECUENCIA_ESPERADA
    
@@ -103,8 +104,7 @@ END
 
 GET_LISTA 
 print lista_fo
-multiples (2 2 9 6 3) > 0 m
-print m
+
 /*Mostrar (print) la tabla de frecuencias observadas y frecuencias esperadas*/
 /*
 cantidad_fe_menos_uno = cantidad_fe - 1
