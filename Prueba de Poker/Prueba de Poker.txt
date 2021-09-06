@@ -3,70 +3,58 @@ Evaluacion 3 - Prueba de Poker
 Kevin Fallas Alvarado 2019057752
 Esteban Madrigal Marin 2018154123
 
-Chi Cuadrado prueba "91 Ejemplo n=30" con 5 decimales es de: 
-Chi Cuadrado prueba "92 Ejemplo n=1000" con 5 decimales es de: 
+Chi Cuadrado prueba "91 Ejemplo n=30" con 5 decimales es de: 4.2813 
+Chi Cuadrado prueba "92 Ejemplo n=1000" con 5 decimales es de: 1.45899
 **********************************************************/
 
 CLEAROUTPUT
 
+/*CONSTANTE PARA LA FUNCION EXPLOTAR*/
 CONST 5 cantidad_decimales
 GLOBAL cantidad_decimales
+
+/*LISTA PARA ALMACENAR LAS FRECUENCIAS OBSERVADAS*/
 GLOBAL lista_fo
-
 lista_fo = (0 0 0 0 0 0 0)
+
 /*
-NEWCMD CLASIFICAR num id
-   MULTIPLES num > 1 id
-   IF id = 0
-      id = 7
-   ELSEIF id <> 1 
-      MULTIPLES num > 2 trioCount
-      id = 5 + trioCount
-   END
-END
+OBTIENE LA CLASIFICACIÓN DE LOS NUMEROS 
+PUEDEN SER: TODAS DIFERENTES, UN PAR, DOS PARAES,
+UNA TERCIA, FULL HOUSE, POKER, QUINTILLA
 */
-NEWCMD CLASIFICAR hand category
-   /* Códigos de las clasificaciones: 
-   1 - Quintilla
-   2 - Poker
-   3 - Tercia
-   4 - Un par
-   5 - Dos pares
-   6 - Full
-   7 - Todos diferentes
-   */
-   MULTIPLES hand > 1 multipleCount /*Cuenta grupos de iguales */
-   IF multipleCount = 0 /* Si no hay grupos, son todas diferentes*/
-      category = 7
-   ELSEIF multipleCount = 1 /*Si hay un grupo, puede ser quintilla, poker, tercia o un par */
-      MULTIPLES hand > 0 category /*Cuenta cantidad de digitos unicos, la cantidad corresponde al código de clasificación*/
-   ELSE /* Si hay dos grupos, puede ser Full o dos pares*/
-      MULTIPLES hand > 2 trioCount /*Cuenta grupos de tres */
-      category = 5 + trioCount /*Si hay un grupo de tres, es Full, sino es dos pares*/
+NEWCMD GET_CLASIFICACION cartas clasificacion
+   MULTIPLES cartas > 1 multiples_res 'CUENTA GRUPOS DE IGUALES
+   IF multiples_res = 0 'VERIFICA SI TODAS SON DIFERENTES
+      clasificacion = 7
+   ELSEIF multiples_res = 1 'CON UN GRUPO PUEDE SER QUINTILLA, POKER, TERCIA O UN PAR
+      MULTIPLES cartas > 0 clasificacion 'OBTIENE GRUPO DE CLASIFICACION
+   ELSE 'SI HAY MAS, ES FULL HOUSE O TIENE DOS PARES
+      MULTIPLES cartas > 2 cantidad_tercias 'CANTIDAD DE TERCIAS
+      clasificacion = 5 + cantidad_tercias 'ES FULL O TIENE DOS PARES
    END
 END
 
-/*Calcular las fo*/
-NEWCMD GET_FRECUENCIA_OBSERVADA lista_numeros
-      CLASIFICAR lista_numeros category
-      IF category = 7
-         ADD (1 0) lista_fo lista_fo
-      ELSEIF category = 4
-         ADD (0 1 0) lista_fo lista_fo
-      ELSEIF category = 5
-         ADD (0 0 1 0) lista_fo lista_fo
-      ELSEIF category = 3
-         ADD (0 0 0 1 0) lista_fo lista_fo
-      ELSEIF category = 6
-         ADD (0 0 0 0 1 0) lista_fo lista_fo
-      ELSEIF category = 2
-         ADD (0 0 0 0 0 1 0) lista_fo lista_fo
-      ELSE
-         ADD (0 0 0 0 0 0 1) lista_fo lista_fo
-      END
+/*SUMA LAS FRENCUENCIAS OBSERVADAS SEGUN LAS CLASIFICACIONES*/
+NEWCMD CONTAR_FRECUENCIA_OBSERVADA lista_numeros
+   GET_CLASIFICACION lista_numeros clasificacion
+   IF clasificacion = 7 ' TODAS DIFERENTES
+      ADD (1 0) lista_fo lista_fo
+   ELSEIF clasificacion = 4 ' UN PAR
+      ADD (0 1 0) lista_fo lista_fo
+   ELSEIF clasificacion = 5 ' DOS PARES
+      ADD (0 0 1 0) lista_fo lista_fo
+   ELSEIF clasificacion = 3 ' TERCIA
+      ADD (0 0 0 1 0) lista_fo lista_fo
+   ELSEIF clasificacion = 6 ' FULL HOUSE
+      ADD (0 0 0 0 1 0) lista_fo lista_fo
+   ELSEIF clasificacion = 2 ' POKER
+      ADD (0 0 0 0 0 1 0) lista_fo lista_fo
+   ELSE ' QUINTILLA
+      ADD (0 0 0 0 0 0 1) lista_fo lista_fo
+   END
 END
 
-/*Cargar (read) un archivo de datos.*/
+/*OBTIENE LOS DECIMALES DE UN NUMERO*/
 NEWCMD EXPLOTAR dec num lista
    decMasUno = dec + 1
    res = ()
@@ -83,38 +71,45 @@ NEWCMD EXPLOTAR dec num lista
    TAKE res 1, dec lista
 END
 
-NEWCMD GET_LISTA
-   READ "D:\\Documentos\\Ing en Computacion\\Semestre Vl\\Simulación\\Evaluaciones\\Simulaciones\\Prueba de Poker" lista_numeros
-   print lista_numeros
-   SIZE lista_numeros n
+/*OBTIENE LAS FRECUENCIAS OBSERVADAS QUE ESTAN EN LA LISTA*/
+NEWCMD GET_FRECUENCIAS_OBSERVADAS lista_numeros
    FOREACH mazo lista_numeros
       EXPLOTAR cantidad_decimales mazo lista
-      print lista
-      GET_FRECUENCIA_OBSERVADA lista
+      CONTAR_FRECUENCIA_OBSERVADA lista
    END
 END
 
-/*
-NEWCMD GET_FRECUENCIA_ESPERADA
-   
+/*REALIZA EL CALCULO DE LAS FRECUENCIAS ESPERADAS Y RETORNA EL RESULTADO*/
+NEWCMD GET_FRECUENCIA_ESPERADA tamano_lista lista_fo
+   probabilidades = (0.3024 0.5040 0.1080 0.0720 0.0090 0.0045 0.0001)
+   lista_fo = ()
+   FOREACH probabilidad probabilidades
+      frecuencia_esperada = probabilidad * tamano_lista
+      SCORE frecuencia_esperada lista_fo
+   END
 END
-*/
-
-/* Main */
-
-GET_LISTA 
-print lista_fo
-
-/*Mostrar (print) la tabla de frecuencias observadas y frecuencias esperadas*/
-/*
-cantidad_fe_menos_uno = cantidad_fe - 1
-newBin = 0, cantidad_fe_menos_uno
-newFo = lista_fo_actualizada
-newFe = lista_fe_actualizada
-PRINT TABLE newBin%2.0F newFo newFe
-PRINT
 
 
-CHISQUARE  lista_fo_actualizada lista_fe_actualizada chiSquareResult
-PRINT chiSquareResult
-*/
+/* PROGRAMA PRINCIPAL */
+
+/*LEE EL ARCHIVO CON LOS NUMEROS DE PRUEBA*/
+READ "D:\\Documentos\\Ing en Computacion\\Semestre Vl\\Simulación\\Evaluaciones\\Simulaciones\\Prueba de Poker" lista_numeros
+SIZE lista_numeros tamano_lista
+
+/*SE OBTIENEN LAS FRECUENCIAS Y EL CHI CUADRADO*/
+GET_FRECUENCIAS_OBSERVADAS lista_numeros
+GET_FRECUENCIA_ESPERADA tamano_lista lista_fe
+CHISQUARE  lista_fo lista_fe resultado_ChiCuadrado
+
+/*SE CREAN LAS CLASIFICACIONES PARA LA TABLA*/
+NAME (1 2 3 4 5 6 7) Diferentes Un_par Dos_Pares Tercia Full_House Poker Quintilla
+clase = (Diferentes Un_par Dos_Pares Tercia Full_House Poker Quintilla)
+
+/*SE IMPRIME EN UNA TABLA LAS FRECUENCIAS OBSERVADAS Y ESPERADAS PARA CADA CATEGORIA*/
+PRINT TABLE clase lista_fo%8.0F lista_fe%2.3F
+PRINT ""
+
+/*IMPRIME EL RESULTADO DEL CHI CUADRADO OBTENIDO*/
+PRINT resultado_ChiCuadrado
+
+
