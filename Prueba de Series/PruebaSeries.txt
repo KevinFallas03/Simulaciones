@@ -1,0 +1,20 @@
+/**********************************************************************************
+Evaluacion 4 - Prueba de Series
+Kevin Fallas Alvarado 2019057752
+Esteban Madrigal Marin 2018154123
+
+Chi Cuadrado prueba "80 Clase n=100" con 5 intervalos es de:
+Chi Cuadrado prueba "90 AAA Pruieba Series n=1000" con 5 intervalos es de: 
+Chi Cuadrado prueba "91 BBB Pruieba Series n=1000" con 5 intervalos es de: 
+***********************************************************************************/
+
+/* OBTIENE FRECUENCIAS OBSERVADAS */
+
+
+/* OBTIENE FRECUENCIAS ESPERADAS */
+
+
+/* IMPRIMIR TABLA DE LAS FRECUENCIAS OBSERVADAS */
+
+
+/* MAIN */
