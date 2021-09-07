@@ -12,7 +12,10 @@ Chi Cuadrado prueba "91 BBB Pruieba Series n=1000" con 5 intervalos es de:
 
 
 /* OBTIENE FRECUENCIAS ESPERADAS */
-
+NEWCMD GET_FRECUENCIA_ESPERADA lista_numeros intervalo frecuencia_esperada
+	SIZE lista_numeros cantidad_numeros
+	frecuencia_esperada = (cantidad_numeros - 1) / (intervalo * intervalo)
+END
 
 /* IMPRIMIR TABLA DE LAS FRECUENCIAS OBSERVADAS */
 
