@@ -56,8 +56,10 @@ NEWCMD GET_FRECUENCIAS_OBSERVADAS lista_numeros cantidad_numeros intervalo canti
 END
 
 /* OBTIENE FRECUENCIAS ESPERADAS */
-NEWCMD GET_FRECUENCIA_ESPERADA lista_numeros intervalo cantidad_numeros frecuencia_esperada
-   frecuencia_esperada = (cantidad_numeros - 1) / (intervalo * intervalo)
+NEWCMD GET_FRECUENCIA_ESPERADA lista_numeros cantidad_intervalos cantidad_numeros lista_fe
+   denominador = cantidad_intervalosvalo * cantidad_intervalos
+   frecuencia_esperada = (cantidad_numeros - 1) / (cantidad_intervalosvalo * cantidad_intervalos)
+   COPY denominador#frecuencia_esperada lista_fe
 END
 
 /* IMPRIMIR TABLA DE LAS FRECUENCIAS OBSERVADAS */
@@ -71,3 +73,5 @@ INPUT cantidad_intervalos
 intervalo = 1/cantidad_intervalos
 
 GET_FRECUENCIAS_OBSERVADAS lista_numeros cantidad_numeros intervalo cantidad_intervalos
+GET_FRECUENCIA_ESPERADA lista_numeros cantidad_intervalos cantidad_numeros lista_fe
+getChiSquare fo lista_fe chiCuadrado
