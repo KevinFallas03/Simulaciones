@@ -3,22 +3,40 @@ Evaluacion 4 - Prueba de Series
 Kevin Fallas Alvarado 2019057752
 Esteban Madrigal Marin 2018154123
 
-Chi Cuadrado prueba "80 Clase n=100" con 5 intervalos es de:
-Chi Cuadrado prueba "90 AAA Pruieba Series n=1000" con 5 intervalos es de: 
-Chi Cuadrado prueba "91 BBB Pruieba Series n=1000" con 5 intervalos es de: 
+Chi Cuadrado prueba "80 Clase n=100" con 5 intervalos es de: 15.898989898989898
+Chi Cuadrado prueba "90 AAA Pruieba Series n=1000" con 5 intervalos es de: 19.293293293293292
+Chi Cuadrado prueba "91 BBB Pruieba Series n=1000" con 5 intervalos es de: 33.60760760760762
 ***********************************************************************************/
 
 CLEAROUTPUT
-/* OBTIENE FRECUENCIAS OBSERVADAS */
-NEWCMD GET_FRECUENCIAS_OBSERVADAS lista_numeros cantidad_numeros intervalo cantidad_intervalos
-   
-   /* CREAR MATRIZ */
-   NEWARRAY empty_matrix cantidad_intervalos cantidad_intervalos
+
+INPUT cantidad_intervalos
+NEWARRAY empty_matrix cantidad_intervalos cantidad_intervalos
+GLOBAL empty_matrix
+
+NEWCMD FILL_MATRIX cantidad_intervalos
+   /* LLENA MATRIZ DE CEROS */
    FOREACH row 1,cantidad_intervalos
       FOREACH col 1,cantidad_intervalos
          empty_matrix[row][col] = 0
       END
    END
+END
+
+NEWCMD PRINT_MATRIX cantidad_intervalos
+   /* LLENA MATRIZ DE CEROS */
+   FOREACH row cantidad_intervalos,1
+      FOREACH col 1,cantidad_intervalos
+         OUTPUT "%5.3F  "empty_matrix[row][col]
+      END
+      OUTPUT "\n"
+   END
+END
+
+/* OBTIENE FRECUENCIAS OBSERVADAS */
+NEWCMD GET_FRECUENCIAS_OBSERVADAS lista_numeros cantidad_numeros intervalo cantidad_intervalos frecuenciasObsv
+   
+   FILL_MATRIX cantidad_intervalos
    
    limite = cantidad_numeros - 1
    FOREACH id_num 1,limite
@@ -44,34 +62,31 @@ NEWCMD GET_FRECUENCIAS_OBSERVADAS lista_numeros cantidad_numeros intervalo canti
          END
          row = row+1
       END
-      row = 1
-      col = 1
    END
-   FOREACH row cantidad_intervalos,1
+   /* IMPRIMIR TABLA DE LAS FRECUENCIAS OBSERVADAS */
+   PRINT_MATRIX cantidad_intervalos
+   FOREACH row 1,cantidad_intervalos
       FOREACH col 1,cantidad_intervalos
-         OUTPUT "%5.3F  "empty_matrix[row][col]
+         CONCAT frecuenciasObsv empty_matrix[row][col] frecuenciasObsv
       END
-      OUTPUT "\n"
    END
 END
 
 /* OBTIENE FRECUENCIAS ESPERADAS */
 NEWCMD GET_FRECUENCIA_ESPERADA lista_numeros cantidad_intervalos cantidad_numeros lista_fe
-   denominador = cantidad_intervalosvalo * cantidad_intervalos
-   frecuencia_esperada = (cantidad_numeros - 1) / (cantidad_intervalosvalo * cantidad_intervalos)
+   denominador = cantidad_intervalos * cantidad_intervalos
+   frecuencia_esperada = (cantidad_numeros - 1) / (cantidad_intervalos * cantidad_intervalos)
    COPY denominador#frecuencia_esperada lista_fe
 END
-
-/* IMPRIMIR TABLA DE LAS FRECUENCIAS OBSERVADAS */
-
 
 /* MAIN */
 READ lista_numeros
 SIZE lista_numeros cantidad_numeros
 
-INPUT cantidad_intervalos
 intervalo = 1/cantidad_intervalos
 
-GET_FRECUENCIAS_OBSERVADAS lista_numeros cantidad_numeros intervalo cantidad_intervalos
+GET_FRECUENCIAS_OBSERVADAS lista_numeros cantidad_numeros intervalo cantidad_intervalos lista_fo
 GET_FRECUENCIA_ESPERADA lista_numeros cantidad_intervalos cantidad_numeros lista_fe
-getChiSquare fo lista_fe chiCuadrado
+chisquare lista_fo lista_fe chiCuadrado
+
+print "\n" chiCuadrado
