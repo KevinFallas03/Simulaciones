@@ -21,3 +21,6 @@ END
 
 
 /* MAIN */
+READ lista_numeros
+INPUT cantidad_intervalos
+intervalo = 1/cantidad_intervalos
