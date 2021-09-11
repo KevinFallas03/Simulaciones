@@ -87,6 +87,6 @@ intervalo = 1/cantidad_intervalos
 
 GET_FRECUENCIAS_OBSERVADAS lista_numeros cantidad_numeros intervalo cantidad_intervalos lista_fo
 GET_FRECUENCIA_ESPERADA lista_numeros cantidad_intervalos cantidad_numeros lista_fe
-chisquare lista_fo lista_fe chiCuadrado
+CHISQUARE lista_fo lista_fe chiCuadrado
 
-print "\n" chiCuadrado
+PRINT "\n" chiCuadrado
