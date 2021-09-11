@@ -11,14 +11,14 @@ Chi Cuadrado prueba "91 BBB Pruieba Series n=1000" con 5 intervalos es de: 33.60
 CLEAROUTPUT
 
 INPUT cantidad_intervalos
-NEWARRAY empty_matrix cantidad_intervalos cantidad_intervalos
-GLOBAL empty_matrix
+NEWARRAY matriz cantidad_intervalos cantidad_intervalos
+GLOBAL matriz
 
 NEWCMD FILL_MATRIX cantidad_intervalos
    /* LLENA MATRIZ DE CEROS */
    FOREACH row 1,cantidad_intervalos
       FOREACH col 1,cantidad_intervalos
-         empty_matrix[row][col] = 0
+         matriz[row][col] = 0
       END
    END
 END
@@ -27,14 +27,14 @@ NEWCMD PRINT_MATRIX cantidad_intervalos
    /* LLENA MATRIZ DE CEROS */
    FOREACH row cantidad_intervalos,1
       FOREACH col 1,cantidad_intervalos
-         OUTPUT "%5.3F  "empty_matrix[row][col]
+         OUTPUT "%5.3F  " matriz[row][col]
       END
       OUTPUT "\n"
    END
 END
 
 /* OBTIENE FRECUENCIAS OBSERVADAS */
-NEWCMD GET_FRECUENCIAS_OBSERVADAS lista_numeros cantidad_numeros intervalo cantidad_intervalos frecuenciasObsv
+NEWCMD GET_FRECUENCIAS_OBSERVADAS lista_numeros cantidad_numeros intervalo cantidad_intervalos frecuencias_observadas
    
    FILL_MATRIX cantidad_intervalos
    
@@ -47,16 +47,16 @@ NEWCMD GET_FRECUENCIAS_OBSERVADAS lista_numeros cantidad_numeros intervalo canti
       TAKE lista_numeros next coordenada_y
       
       /* BUSCAMOS DONDE COLOCARLO */
-      searching = true
+      buscando = true
       row = 1
-      WHILE row <= cantidad_intervalos AND searching
+      WHILE row <= cantidad_intervalos AND buscando
          rango_y = intervalo*row
          col = 1
-         WHILE col <= cantidad_intervalos AND searching
+         WHILE col <= cantidad_intervalos AND buscando
             rango_x = intervalo*col
             IF coordenada_x <= rango_x AND coordenada_y  <= rango_y
-               empty_matrix[row][col] = empty_matrix[row][col]+1
-               searching = false
+               matriz[row][col] = matriz[row][col]+1
+               buscando = false
             END
             col = col+1
          END
@@ -67,7 +67,7 @@ NEWCMD GET_FRECUENCIAS_OBSERVADAS lista_numeros cantidad_numeros intervalo canti
    PRINT_MATRIX cantidad_intervalos
    FOREACH row 1,cantidad_intervalos
       FOREACH col 1,cantidad_intervalos
-         CONCAT frecuenciasObsv empty_matrix[row][col] frecuenciasObsv
+         CONCAT frecuencias_observadas matriz[row][col] frecuencias_observadas
       END
    END
 END
