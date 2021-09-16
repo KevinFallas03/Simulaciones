@@ -1,0 +1,45 @@
+/***********************************************************************************************
+Evaluacion 5 - Prueba de Ajuste para Ji cuadrado
+Kevin Fallas Alvarado 2019057752
+Esteban Madrigal Marin 2018154123
+
+Resultado: 
+Para el ejemplo:
+	
+
+Con 10 mil valores:
+	Con intervalos de 1:
+	Con intervalos de 2:
+************************************************************************************************/
+
+CLEAROUTPUT
+
+/*** CALCULOS DE MEAN, DESVIACION ESTANDAR, SIZE ***/
+NEWCMD CALCULAR_DATOS muesta mean_ desviacion_ tamaño_muestra_
+	MEAN muestra mean_
+	STDEV _datos _desviacion
+	SIZE _datos _tamañoMuestra
+END
+
+/*** CALCULA PROBABILIDAD ESPERADA ***/
+
+
+/*** CALCULA FRECUENCIA ESPERADA ***/
+
+
+
+/*** CALCULA LA PROBABILIDAD ACUMULADA DE UN INTERVALO ****/
+NEWCMD PROB_NORMAL_RANGO limInf limSup promedio desviación prob_
+       normalprob limInf promedio desviación probInf
+       normalprob limSup promedio desviación probSup
+       prob_ = probSup - probInf
+END
+
+
+/***** MAIN *****/
+
+READ file "" muesta
+INPUT tamaño_intervalo
+CALCULAR_DATOS muesta promedio desviacion tamaño_muestra
+
+'CHISQUARE lista_fo lista_fe chiCuadrado
