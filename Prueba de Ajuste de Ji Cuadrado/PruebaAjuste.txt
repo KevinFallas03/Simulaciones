@@ -14,32 +14,94 @@ Con 10 mil valores:
 
 CLEAROUTPUT
 
-/*** CALCULOS DE MEAN, DESVIACION ESTANDAR, SIZE ***/
-NEWCMD CALCULAR_DATOS muesta mean_ desviacion_ tamaÃ±o_muestra_
-	MEAN muestra mean_
-	STDEV _datos _desviacion
-	SIZE _datos _tamaÃ±oMuestra
+/*** CALCULA LA PROBABILIDAD ACUMULADA DE UN INTERVALO ****/
+NEWCMD PROB_NORMAL_RANGO limInf limSup promedio desviacion prob_
+   normalprob limInf promedio desviacion probInf
+   normalprob limSup promedio desviacion probSup
+   prob_ = probSup - probInf
 END
 
-/*** CALCULA PROBABILIDAD ESPERADA ***/
+/*** CALCULOS DE MEAN, DESVIACION ESTANDAR, SIZE ***/
+NEWCMD CALCULAR_DATOS muestra mean_ desviacion_ tamaño_muestra_
+   MEAN muestra mean_
+   STDEV muestra desviacion_
+   SIZE muestra tamaño_muestra_
+END
 
+/*** CALCULA FRECUENCIA OBSERVADA ***/
+NEWCMD CALCULA_FRECUENCIA_OBSERVADA tamaño_intervalo muestra binInicio_ binFinal_ freqObservada_
+   HISTOGRAM binsize tamaño_intervalo muestra
+   HISTOGRAMDATA binsize tamaño_intervalo muestra binNumero binInicio_ binCentro freqObservada_ cumFreq
+   binFinal_ = binInicio_ + tamaño_intervalo
+END
 
 /*** CALCULA FRECUENCIA ESPERADA ***/
-
-
-
-/*** CALCULA LA PROBABILIDAD ACUMULADA DE UN INTERVALO ****/
-NEWCMD PROB_NORMAL_RANGO limInf limSup promedio desviaciÃ³n prob_
-       normalprob limInf promedio desviaciÃ³n probInf
-       normalprob limSup promedio desviaciÃ³n probSup
-       prob_ = probSup - probInf
+NEWCMD CALCULA_FRECUENCIA_ESPERADA binInicio binFinal promedio desviacion tamaño_muestra frecuencias_esperadas_
+   SIZE binInicio tamaño_datos
+   frecuencias_esperadas_ = ()
+   FOREACH n 1,tamaño_datos
+      TAKE binInicio n limite_inferior
+      TAKE binFinal n limite_superior
+      PROB_NORMAL_RANGO limite_inferior limite_superior promedio desviacion prob
+      FE = prob*tamaño_muestra
+      CONCAT frecuencias_esperadas_ FE frecuencias_esperadas_
+   END
 END
 
+/*** LIMPIAR FRECUENCIAS ESPERADA ***/
+NEWCMD LIMPIAR_FRECUENCIAS_ESPERADA binInicio binFinal frecuencias_esperadas freqObservada
+   SIZE freqObservada tamaño_freqObservada
+   n = 1
+   WHILE n <= tamaño_freqObservada
+      TAKE frecuencias_esperadas n dato
+      IF dato < 5
+         REMOVE freqObservada n freqObservada
+         REMOVE binInicio n binInicio
+         REMOVE binFinal n binFinal
+         REMOVE frecuencias_esperadas n frecuencias_esperadas
+         SIZE freqObservada tamaño_freqObservada
+      ELSE
+         n = n+1
+      END
+      
+   END
+END
+
+/*** LIMPIAR FRECUENCIAS OBSERVADA ***/
+NEWCMD LIMPIAR_FRECUENCIAS_OBSERVADA freqObservada binInicio binFinal
+   SIZE freqObservada tamaño_freqObservada
+   n = 1
+   WHILE n <= tamaño_freqObservada
+      TAKE freqObservada n dato
+      IF dato <= 0
+         REMOVE freqObservada n freqObservada
+         REMOVE binInicio n binInicio
+         REMOVE binFinal n binFinal
+         SIZE freqObservada tamaño_freqObservada
+      ELSE
+         n = n+1
+      END
+   END
+END
 
 /***** MAIN *****/
 
-READ file "" muesta
-INPUT tamaÃ±o_intervalo
-CALCULAR_DATOS muesta promedio desviacion tamaÃ±o_muestra
+READ file "" muestra
+INPUT tamaño_intervalo
+CALCULAR_DATOS muestra promedio desviacion tamaño_muestra
 
-'CHISQUARE lista_fo lista_fe chiCuadrado
+'PRINT promedio
+'PRINT desviacion
+'PRINT tamaño_muestra
+
+CALCULA_FRECUENCIA_OBSERVADA tamaño_intervalo muestra binInicio binFinal freqObservada
+'PRINT table binInicio binFinal freqObservada
+LIMPIAR_FRECUENCIAS_OBSERVADA freqObservada binInicio binFinal
+'PRINT table binInicio binFinal freqObservada
+
+CALCULA_FRECUENCIA_ESPERADA binInicio binFinal promedio desviacion tamaño_muestra frecuencias_esperadas
+LIMPIAR_FRECUENCIAS_ESPERADA binInicio binFinal frecuencias_esperadas freqObservada
+PRINT table binInicio%8.0F freqObservada%8.4F frecuencias_esperadas%4.4F
+
+CHISQUARE freqObservada frecuencias_esperadas chiCuadrado
+PRINT chiCuadrado
