@@ -85,14 +85,9 @@ READ file "" muestra
 INPUT tamaño_intervalo
 CALCULAR_DATOS muestra promedio desviacion tamaño_muestra
 
-'PRINT promedio
-'PRINT desviacion
-'PRINT tamaño_muestra
-
 CALCULA_FRECUENCIA_OBSERVADA tamaño_intervalo muestra binInicio binFinal freqObservada
-'PRINT table binInicio binFinal freqObservada
+
 LIMPIAR_FRECUENCIAS_OBSERVADA freqObservada binInicio binFinal
-'PRINT table binInicio binFinal freqObservada
 
 CALCULA_FRECUENCIA_ESPERADA binInicio binFinal promedio desviacion tamaño_muestra frecuencias_esperadas
 LIMPIAR_FRECUENCIAS_ESPERADA binInicio binFinal frecuencias_esperadas freqObservada
