@@ -3,13 +3,9 @@ Evaluacion 5 - Prueba de Ajuste para Ji cuadrado
 Kevin Fallas Alvarado 2019057752
 Esteban Madrigal Marin 2018154123
 
-Resultado: 
-Para el ejemplo:
-	
-
-Con 10 mil valores:
-	Con intervalos de 1:
-	Con intervalos de 2:
+Resultado con 10 mil valores:
+	Con intervalos de 1: 33.2837323555378
+	Con intervalos de 2: 16.4209843315095
 ************************************************************************************************/
 
 CLEAROUTPUT
@@ -63,7 +59,6 @@ NEWCMD LIMPIAR_FRECUENCIAS_ESPERADA binInicio binFinal frecuencias_esperadas fre
       ELSE
          n = n+1
       END
-      
    END
 END
 
