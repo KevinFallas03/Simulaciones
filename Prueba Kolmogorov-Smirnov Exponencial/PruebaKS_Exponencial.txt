@@ -1,0 +1,57 @@
+/***********************************************************************************************
+Evaluacion 5 - Prueba KS para una Exponencial
+Kevin Fallas Alvarado 2019057752
+Esteban Madrigal Marin 2018154123
+
+Resultado para el archivo de clase:
+Resultado para el archivo de clase:
+************************************************************************************************/
+
+CLEAROUTPUT
+global e 
+e = 2.718281828
+
+/*** CALCULA LA PROBABILIDAD ACUMULADA DE UN INTERVALO ****/
+NEWCMD PROB_NORMAL_RANGO limInf limSup promedio desviacion prob_
+   NORMALPROB limInf promedio desviacion probInf
+   NORMALPROB limSup promedio desviacion probSup
+   prob_ = probSup - probInf
+END
+
+/*** CALCULOS DE MEAN, DESVIACION ESTANDAR, SIZE ***/
+NEWCMD CALCULAR_DATOS muestra mean_ desviacion_ tamaño_muestra_
+   MEAN muestra mean_
+   STDEV muestra desviacion_
+   SIZE muestra tamaño_muestra_
+END
+
+/*** CALCULA FRECUENCIA OBSERVADA ***/
+NEWCMD CALCULA_FRECUENCIA_OBSERVADA tamaño_intervalo muestra binInicio_ binFinal_ frec_observada_
+   HISTOGRAM binsize tamaño_intervalo muestra
+   HISTOGRAMDATA binsize tamaño_intervalo muestra binNumero binInicio_ binCentro frec_observada_ cumFreq
+   binFinal_ = binInicio_ + tamaño_intervalo
+END
+
+/*** CALCULA FRECUENCIA OBSERVADA ACUMULADA Y PROB. OBSERVADA ACUMULADA ***/
+
+
+/*** CALCULA FRECUENCIA ESPERADA ACUMULADA ***/
+NEWCMD CALCULA_FRECUENCIA_ESPERADA_ACUMULADA beta_prom limite_superior prob_acum_esperadas_
+   prob_acum_esperadas_ = 1 - e ^ ( - limite_superior / beta_prom )
+END
+
+
+/***** MAIN *****/
+
+READ file "" muestra
+INPUT tamaño_intervalo
+CALCULAR_DATOS muestra promedio desviacion tamaño_muestra
+
+CALCULA_FRECUENCIA_OBSERVADA tamaño_intervalo muestra binInicio binFinal freqObservada
+
+CALCULA_FRECUENCIA_ESPERADA_ACUMULADA promedio limite_superior frecuencias_esperadas
+
+PRINT table binInicio%8.0F freqObservada%8.4F frecuencias_esperadas%4.4F
+
+CHISQUARE freqObservada frecuencias_esperadas chiCuadrado
+PRINT chiCuadrado
