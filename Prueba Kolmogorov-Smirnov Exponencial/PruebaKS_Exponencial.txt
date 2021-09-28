@@ -8,7 +8,7 @@ Resultado para el archivo de clase:
 ************************************************************************************************/
 
 CLEAROUTPUT
-global e 
+global e
 e = 2.718281828
 
 /*** CALCULA LA PROBABILIDAD ACUMULADA DE UN INTERVALO ****/
@@ -19,9 +19,8 @@ NEWCMD PROB_NORMAL_RANGO limInf limSup promedio desviacion prob_
 END
 
 /*** CALCULOS DE MEAN, DESVIACION ESTANDAR, SIZE ***/
-NEWCMD CALCULAR_DATOS muestra mean_ desviacion_ tamaño_muestra_
+NEWCMD CALCULAR_DATOS muestra mean_ tamaño_muestra_
    MEAN muestra mean_
-   STDEV muestra desviacion_
    SIZE muestra tamaño_muestra_
 END
 
@@ -30,28 +29,57 @@ NEWCMD CALCULA_FRECUENCIA_OBSERVADA tamaño_intervalo muestra binInicio_ binFinal
    HISTOGRAM binsize tamaño_intervalo muestra
    HISTOGRAMDATA binsize tamaño_intervalo muestra binNumero binInicio_ binCentro frec_observada_ cumFreq
    binFinal_ = binInicio_ + tamaño_intervalo
+   
 END
 
 /*** CALCULA FRECUENCIA OBSERVADA ACUMULADA Y PROB. OBSERVADA ACUMULADA ***/
 
-
-/*** CALCULA FRECUENCIA ESPERADA ACUMULADA ***/
-NEWCMD CALCULA_FRECUENCIA_ESPERADA_ACUMULADA beta_prom limite_superior prob_acum_esperadas_
-   prob_acum_esperadas_ = 1 - e ^ ( - limite_superior / beta_prom )
+/*** CALCULA PROBABILIDAD OBERVADA ACUMULADA ***/
+NEWCMD CALCULA_PROBABILIDAD_OBERVADA_ACUMULADA fo_acumulado tamaño_muestra prob_observada_acumulada_
+   prob_observada_acumulada_ = fo_acumulado/tamaño_muestra
 END
-
+/*** CALCULA FRECUENCIA OBERVADA ACUMULADA ***/
+NEWCMD CALCULA_FRECUENCIA_OBERVADA_ACUMULADA fo_acumulado fo_actual
+   fo_acumulado = fo_acumulado + fo_actual
+END
+/*** CALCULA FRECUENCIA ESPERADA ACUMULADA ***/
+NEWCMD CALCULA_FRECUENCIA_ESPERADA_ACUMULADA beta_prom limite_superior prob_esperada_acumulada_
+   prob_esperada_acumulada_ = 1 - e ^ ( - limite_superior / beta_prom )
+END
+NEWCMD CALCULA_ACUMULADAS frec_observada tamaño_muestra tamaño_intervalo promedio frec_observada_acumulada_ prob_observada_acumulada_ prob_esperada_acumulada_
+   frec_observada_acumulada_= ()
+   prob_observada_acumulada_ = ()
+   prob_esperada_acumulada_ = ()
+   fo_acumulado = 0
+   counter = 1
+   lim_superior = tamaño_intervalo
+   FOREACH fo frec_observada
+      CALCULA_FRECUENCIA_OBERVADA_ACUMULADA fo_acumulado fo
+      PUT fo_acumulado counter frec_observada_acumulada_
+      
+      CALCULA_PROBABILIDAD_OBERVADA_ACUMULADA fo_acumulado tamaño_muestra prob_observada_acumulada
+      PUT prob_observada_acumulada counter prob_observada_acumulada_
+      
+      CALCULA_FRECUENCIA_ESPERADA_ACUMULADA promedio lim_superior prob_esperada_acumulada
+      PUT prob_esperada_acumulada counter prob_esperada_acumulada_
+      
+      lim_superior = lim_superior+tamaño_intervalo
+      counter = counter+1
+   END
+END
 
 /***** MAIN *****/
 
 READ file "" muestra
 INPUT tamaño_intervalo
-CALCULAR_DATOS muestra promedio desviacion tamaño_muestra
-
+CALCULAR_DATOS muestra promedio tamaño_muestra
 CALCULA_FRECUENCIA_OBSERVADA tamaño_intervalo muestra binInicio binFinal freqObservada
+CALCULA_ACUMULADAS freqObservada tamaño_muestra tamaño_intervalo promedio freqObservadaAcumulada probObservadaAcumulada prob_esperada_acumulada
 
-CALCULA_FRECUENCIA_ESPERADA_ACUMULADA promedio limite_superior frecuencias_esperadas
+SUBTRACT probObservadaAcumulada prob_esperada_acumulada poa_menos_pea
+ABS poa_menos_pea poa_menos_pea_positivos
+MAX poa_menos_pea_positivos d
 
-PRINT table binInicio%8.0F freqObservada%8.4F frecuencias_esperadas%4.4F
-
-CHISQUARE freqObservada frecuencias_esperadas chiCuadrado
-PRINT chiCuadrado
+PRINT promedio
+PRINT table binInicio%8.0F freqObservada%8.0F freqObservadaAcumulada%8.0F probObservadaAcumulada%16.6F prob_esperada_acumulada%8.6F poa_menos_pea_positivos%8.4F
+PRINT d
