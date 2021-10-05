@@ -1,0 +1,32 @@
+/***********************************************************************************************
+Tarea 7 - Transformada inversa
+
+Kevin Fallas Alvarado 2019057752
+Esteban Madrigal Marin 2018154123
+
+Resultado:
+************************************************************************************************/
+
+CLEAROUTPUT
+
+
+/*Genera la muestra aleatoria con la transformada inversa de f(x)*/
+NEWCMD OBTENER_MUESTRA_TRASFORMADA_INVERSA 
+
+END
+
+/***** MAIN *****/
+
+/*Lee cantidad de datos a generar: "muestra"*/
+INPUT cantidad_datos_muestra
+
+/*Lee los invervalos para el histograma: "n"*/
+INPUT intervalos_histograma
+
+/*Genera datos utilizando transformada inversa de f(x)*/
+'OBTENER_MUESTRA_TRASFORMADA_INVERSA 
+
+/*Agrupar los datos*/
+
+/*Mostrar el histograma*/
+'HISTOGRAM
