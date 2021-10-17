@@ -1,12 +1,12 @@
 /***********************************************************************************************
-Tarea 8 - Descomposición e Integración
+Tarea 8 - Descomposicion e Integracion
 
 Kevin Fallas Alvarado 2019057752
 Esteban Madrigal Marin 2018154123
 
 Funciones para probar:
 
-1-Una función de Prueba Muy Sencilla en [0,3[
+1-Una funcion de Prueba Muy Sencilla en [0,3[
 newcmd fun x y
  y = (x^2)/9
 end
@@ -22,7 +22,7 @@ newcmd fun x y
  end
 end
 
-3- Una parábola en [0,1[
+3- Una parabola en [0,1[
 newcmd fun x y
  y = 6*x - 6*x^2
 end
@@ -31,56 +31,91 @@ end
 
 /*Funcion a probar*/
 NEWCMD FUN x y
-   y = 6*x - 6*x^2
+   IF 0 <= x and x <= 1
+      y = (2*x)/3
+   ELSEIF 1 <= x and x <= 3
+      y = (6 - 2*x)/6
+   ELSE
+      y = 0
+   END
 END
-
+/*
 NEWCMD GENERAR_VAR puntos x_
+   
    UNIFORM 1 0 1 r
    
    FOREACH
    END
-   
-   NEWCMD OBTENER_MUESTRA_TRASFORMADA_INVERSA cantidad_datos_muestra muestra_
-      muestra_ = ()
-      REPEAT cantidad_datos_muestra
-      'GENERAR_VAR x
-         SCORE x muestra_
-      END
-   END
-   
-   /*CALCULA AREA DE UN INTERVALO CON EL METODO NUMERICO DE LA REGLA DE SIMPSION*/
-   NEWCMD CALCULAR_AREA_SIMPSON limite_superior limite_inferior n_particiones area_
-      h = (limSup - limInf) / n 'tamaño de cada intervalo para Simpson
-      suma_acumulada = 0
-      iteraciones = 0,n_particiones
-      FOREACH iterador iteraciones
-         x = limite_superior + iterador*h
-         FUC x y
-         IF iterador=0 or iterador=n ' si esta al inicio o al final
-            suma_acumulada = suma_acumulada + 1*y ' revisar ese 1
+END*/
+
+/*CALCULA AREA DE UN INTERVALO CON EL METODO NUMERICO DE LA REGLA DE SIMPSION*/
+NEWCMD CALCULAR_AREA_SIMPSON limite_superior limite_inferior n_particiones area_
+   h = (limite_superior - limite_inferior) / n_particiones 'tama�o de cada intervalo para Simpson
+   suma_acumulada = 0
+   iteraciones = 0,n_particiones
+   FOREACH iterador iteraciones
+      x = limite_inferior + iterador*h
+      FUN x y
+      IF iterador=0 or iterador=n_particiones 'si esta al inicio o al final
+         suma_acumulada = suma_acumulada + 1*y ' revisar ese 1
+      ELSE
+         REMAINDER iterador 2 residuo
+         IF residuo = 0
+            suma_acumulada = suma_acumulada + 2*y
          ELSE
-            REMAINDER iterador 2 residuo
-            IF residuo == 0
-               suma_acumulada = suma_acumulada + 2*y
-            ELSE
-               suma_acumulada = suma_acumulada + 4*y
-            END
+            suma_acumulada = suma_acumulada + 4*y
          END
       END
-      area_ = (h/3)*suma_acumulada
    END
+   area_ = (h/3)*suma_acumulada
+END
+
+
+NEWCMD OBTENER_DATOS h limite_inferior particiones_simpson cantidad_intervalos lista_limitesInferiores_ lista_limitesSuperiores_ lista_puntosMedios_ areas_intervalos_ areas_acumuladas_
+   inferior = limite_inferior
+   superior = limite_inferior + h
+   medio = inferior + h/2
+   tamanoActual = 0
+   area_acum = 0
+   tamanoActual = 0
    
-   /***** MAIN *****/
-   
-   /*Inputs del usuario*/
-   CLEAROUTPUT
-   INPUT "Límite Inferior :" limInf 'Número para el límite inferios
-   INPUT "Límite Superior :" limSup 'Número para el límite inferios
-   INPUT "Número intervalos :" n 'Numero para los intervalos a usar
-   INPUT "Particiones Simpson (número par):" nSimpson 'Número para las partciones en Simpson
-   INPUT "Tamaño de Muestra :" tamañoMuestra 'Número pra el tamaño de la muestra a generar
-   
-   
-   
-   /*Mostrar el histograma*/
-   HISTOGRAM binsize h
+   FOREACH i 1,cantidad_intervalos
+      CALCULAR_AREA_SIMPSON superior inferior particiones_simpson area
+      area_acum = area_acum + area
+      SCORE area areas_intervalos_
+      SCORE area_acum areas_acumuladas_
+      SCORE inferior lista_limitesInferiores_
+      SCORE superior lista_limitesSuperiores_
+      SCORE medio lista_puntosMedios_
+      inferior = superior
+      superior = superior + h
+      
+      medio = inferior + h/2
+   END
+END
+/*
+NEWCMD OBTENER_MUESTRA_TRASFORMADA_INVERSA cantidad_datos_muestra muestra_
+   muestra_ = ()
+   REPEAT cantidad_datos_muestra
+      'GENERAR_VAR x
+      'SCORE x muestra_
+   END
+END
+*/
+
+
+/***** MAIN *****/
+
+/*Inputs del usuario*/
+CLEAROUTPUT
+INPUT "Limite Inferior :" limInf 'Numero para el Limite inferios
+INPUT "Limite Superior :" limSup 'Numero para el Limite inferios
+INPUT "Numero intervalos :" n 'Numero para los intervalos a usar
+INPUT "Particiones Simpson (numero par):" nSimpson 'Numero para las partciones en Simpson
+INPUT "Tama�o de Muestra :" tama�oMuestra 'Numero pra el tama�o de la muestra a generar
+
+h = (limSup - limInf) / n
+OBTENER_DATOS h limInf nSimpson n lista_limitesInferiores lista_limitesSuperiores lista_puntosMedios areas_intervalos areas_acumuladas
+print lista_limitesInferiores lista_limitesSuperiores lista_puntosMedios areas_intervalos areas_acumuladas
+/*Mostrar el histograma*/
+'HISTOGRAM binsize h
