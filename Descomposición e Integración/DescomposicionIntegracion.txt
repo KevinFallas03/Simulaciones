@@ -40,20 +40,6 @@ NEWCMD FUN x y
    END
 END
 
-NEWCMD GENERAR_VAR acumulado puntos_medios x_
-   
-   UNIFORM 1 0 1 r
-   index = 1
-   FOREACH i acumulado
-      IF r < i
-         break
-      ELSE
-         index = index + 1
-      END
-   END
-   TAKE puntos_medios index x_
-END
-
 /*CALCULA AREA DE UN INTERVALO CON EL METODO NUMERICO DE LA REGLA DE SIMPSION*/
 NEWCMD CALCULAR_AREA_SIMPSON limite_superior limite_inferior n_particiones area_
    h = (limite_superior - limite_inferior) / n_particiones 'tamaño de cada intervalo para Simpson
@@ -100,15 +86,24 @@ NEWCMD OBTENER_DATOS h limite_inferior particiones_simpson cantidad_intervalos l
    END
 END
 
-NEWCMD OBTENER_MUESTRA_TRASFORMADA_INVERSA areas_acumuladas puntos_medios cantidad_datos_muestra muestra_
-   muestra_ = ()
-   REPEAT cantidad_datos_muestra
-      GENERAR_VAR areas_acumuladas puntos_medios x
-      SCORE x muestra_
+NEWCMD GENERAR_X acumulado puntos_medios x_
+   UNIFORM 1 0 1 r
+   posicion = 1
+   FOREACH i acumulado
+      IF r < i
+         TAKE puntos_medios posicion x_
+         BREAK
+      END
+      posicion = posicion + 1
    END
 END
 
-
+NEWCMD OBTENER_MUESTRA_TRASFORMADA_INVERSA areas_acumuladas puntos_medios cantidad_datos_muestra muestra_
+   REPEAT cantidad_datos_muestra
+      GENERAR_X areas_acumuladas puntos_medios x
+      SCORE x muestra_
+   END
+END
 
 /***** MAIN *****/
 
