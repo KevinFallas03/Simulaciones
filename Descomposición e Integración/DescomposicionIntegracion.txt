@@ -39,14 +39,20 @@ NEWCMD FUN x y
       y = 0
    END
 END
-/*
-NEWCMD GENERAR_VAR puntos x_
+
+NEWCMD GENERAR_VAR acumulado puntos_medios x_
    
    UNIFORM 1 0 1 r
-   
-   FOREACH
+   index = 1
+   FOREACH i acumulado
+      IF r < i
+         break
+      ELSE
+         index = index + 1
+      END
    END
-END*/
+   TAKE puntos_medios index x_
+END
 
 /*CALCULA AREA DE UN INTERVALO CON EL METODO NUMERICO DE LA REGLA DE SIMPSION*/
 NEWCMD CALCULAR_AREA_SIMPSON limite_superior limite_inferior n_particiones area_
@@ -93,15 +99,15 @@ NEWCMD OBTENER_DATOS h limite_inferior particiones_simpson cantidad_intervalos l
       medio = inferior + h/2
    END
 END
-/*
-NEWCMD OBTENER_MUESTRA_TRASFORMADA_INVERSA cantidad_datos_muestra muestra_
+
+NEWCMD OBTENER_MUESTRA_TRASFORMADA_INVERSA areas_acumuladas puntos_medios cantidad_datos_muestra muestra_
    muestra_ = ()
    REPEAT cantidad_datos_muestra
-      'GENERAR_VAR x
-      'SCORE x muestra_
+      GENERAR_VAR areas_acumuladas puntos_medios x
+      SCORE x muestra_
    END
 END
-*/
+
 
 
 /***** MAIN *****/
@@ -116,6 +122,6 @@ INPUT "Tamaño de Muestra :" tamañoMuestra 'Numero pra el tamaño de la muestra a 
 
 h = (limSup - limInf) / n
 OBTENER_DATOS h limInf nSimpson n lista_limitesInferiores lista_limitesSuperiores lista_puntosMedios areas_intervalos areas_acumuladas
-print lista_limitesInferiores lista_limitesSuperiores lista_puntosMedios areas_intervalos areas_acumuladas
+OBTENER_MUESTRA_TRASFORMADA_INVERSA areas_acumuladas lista_puntosMedios tamañoMuestra muestra
 /*Mostrar el histograma*/
-'HISTOGRAM binsize h
+HISTOGRAM binsize h muestra
