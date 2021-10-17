@@ -30,15 +30,9 @@ end
 ************************************************************************************************/
 
 /*Funcion a probar*/
-NEWCMD FUN x y
-   IF 0 <= x and x <= 1
-      y = (2*x)/3
-   ELSEIF 1 <= x and x <= 3
-      y = (6 - 2*x)/6
-   ELSE
-      y = 0
-   END
-END
+newcmd fun x y
+ y = (x^2)/9
+end
 
 /*CALCULA AREA DE UN INTERVALO CON EL METODO NUMERICO DE LA REGLA DE SIMPSION*/
 NEWCMD CALCULAR_AREA_SIMPSON limite_superior limite_inferior n_particiones area_
