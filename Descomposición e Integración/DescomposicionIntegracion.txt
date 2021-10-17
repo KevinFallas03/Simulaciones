@@ -1,0 +1,86 @@
+/***********************************************************************************************
+Tarea 8 - Descomposición e Integración
+
+Kevin Fallas Alvarado 2019057752
+Esteban Madrigal Marin 2018154123
+
+Funciones para probar:
+
+1-Una función de Prueba Muy Sencilla en [0,3[
+newcmd fun x y
+ y = (x^2)/9
+end
+
+2-Una Triangular en [0,3[ 
+newcmd fun x y
+ if 0 <= x and x <= 1
+ y = (2*x)/3
+ elseif 1 <= x and x <= 3
+ y = (6 - 2*x)/6
+ else 
+ y = 0
+ end
+end
+
+3- Una parábola en [0,1[
+newcmd fun x y
+ y = 6*x - 6*x^2
+end
+
+************************************************************************************************/
+
+/*Funcion a probar*/
+NEWCMD FUN x y
+   y = 6*x - 6*x^2
+END
+
+NEWCMD GENERAR_VAR puntos x_
+   UNIFORM 1 0 1 r
+   
+   FOREACH
+   END
+   
+   NEWCMD OBTENER_MUESTRA_TRASFORMADA_INVERSA cantidad_datos_muestra muestra_
+      muestra_ = ()
+      REPEAT cantidad_datos_muestra
+      'GENERAR_VAR x
+         SCORE x muestra_
+      END
+   END
+   
+   /*CALCULA AREA DE UN INTERVALO CON EL METODO NUMERICO DE LA REGLA DE SIMPSION*/
+   NEWCMD CALCULAR_AREA_SIMPSON limite_superior limite_inferior n_particiones area_
+      h = (limSup - limInf) / n 'tamaño de cada intervalo para Simpson
+      suma_acumulada = 0
+      iteraciones = 0,n_particiones
+      FOREACH iterador iteraciones
+         x = limite_superior + iterador*h
+         FUC x y
+         IF iterador=0 or iterador=n ' si esta al inicio o al final
+            suma_acumulada = suma_acumulada + 1*y ' revisar ese 1
+         ELSE
+            REMAINDER iterador 2 residuo
+            IF residuo == 0
+               suma_acumulada = suma_acumulada + 2*y
+            ELSE
+               suma_acumulada = suma_acumulada + 4*y
+            END
+         END
+      END
+      area_ = (h/3)*suma_acumulada
+   END
+   
+   /***** MAIN *****/
+   
+   /*Inputs del usuario*/
+   CLEAROUTPUT
+   INPUT "Límite Inferior :" limInf 'Número para el límite inferios
+   INPUT "Límite Superior :" limSup 'Número para el límite inferios
+   INPUT "Número intervalos :" n 'Numero para los intervalos a usar
+   INPUT "Particiones Simpson (número par):" nSimpson 'Número para las partciones en Simpson
+   INPUT "Tamaño de Muestra :" tamañoMuestra 'Número pra el tamaño de la muestra a generar
+   
+   
+   
+   /*Mostrar el histograma*/
+   HISTOGRAM binsize h
