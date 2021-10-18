@@ -6,7 +6,7 @@ Esteban Madrigal Marin 2018154123
 
 Funcion inicial
          {    0                     si x < 0
-f(x)  =  {    (3/2)*(x² - 2*x + 1)  si 0 <= x < 1
+f(x)  =  {    (3/2)*(xÂ² - 2*x + 1)  si 0 <= x < 1
          {    x/3                   si 1 <= x < 2 
 
 Funcion acumulada
@@ -46,7 +46,7 @@ NEWCMD OBTENER_MUESTRA_TRASFORMADA_INVERSA cantidad_datos_muestra muestra_
    END
 END
 
-/***** MAIN *****/
+/***** MAINN *****/
 
 /*Lee cantidad de datos a generar: "muestra"*/
 INPUT cantidad_datos_muestra
