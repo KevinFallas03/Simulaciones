@@ -111,6 +111,17 @@ INPUT "Tamaño de Muestra :" tamañoMuestra 'Numero pra el tamaño de la muestra a 
 
 h = (limSup - limInf) / n
 OBTENER_DATOS h limInf nSimpson n lista_limitesInferiores lista_limitesSuperiores lista_puntosMedios areas_intervalos areas_acumuladas
+
+/*IMPRESIONES*/
+fx = areas_intervalos
+ptos = lista_puntosMedios
+PRINT TABLE fx%8.4F ptos%8.4F
+
+PRINT ""
+
+fxAcum = areas_acumuladas
+PRINT TABLE fxAcum%8.4F ptos%8.4F
+
 OBTENER_MUESTRA_TRASFORMADA_INVERSA areas_acumuladas lista_puntosMedios tamañoMuestra muestra
 /*Mostrar el histograma*/
 HISTOGRAM binsize h muestra
