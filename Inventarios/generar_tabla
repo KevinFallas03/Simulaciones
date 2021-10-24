@@ -1,0 +1,31 @@
+INCLUDE "D:/TEC/2021/S2/Simulacion/Simulaciones/Inventarios/inventarios.txt"
+CLEAROUTPUT
+
+NEWCMD SIMULAR_N n q r prom_costo_total_
+   prom_costo_total_ = 0
+   REPEAT n
+      i = 50
+periodo = 365
+      SIMULAR_PERIODO q r i periodo dia inventario_inicial hay_pedido dias_pedido inventario_final demanda total_costo_inventario total_costo_faltantes total_costo_ordenes
+      prom_costo_total_ = prom_costo_total_ + total_costo_faltantes + total_costo_inventario + total_costo_ordenes
+   END
+   prom_costo_total_ = prom_costo_total_/n
+END
+
+NEWCMD GENERAR_TABLA
+   list_r = (10 20 30 40 50 60 70 80 90 100)
+   list_q = (100 90 80 70 60 50 40 30 20 10)
+   FOREACH q list_q
+      FOREACH r list_r
+         IF r <= q
+            SIMULAR_N 100 q r promedio
+            SCORE promedio resultados
+         ELSE
+            SCORE 0 resultados
+         END
+      END
+      print resultados
+      resultados = ()
+   END
+END
+GENERAR_TABLA

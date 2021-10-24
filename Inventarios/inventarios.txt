@@ -23,6 +23,17 @@ NEWCMD ACUMULAR_COSTO_FALTANTES total_costo_faltantes inventario
 END
 
 /**************************     ORDENAR    ***************************************************/
+NEWCMD GENERAR_DIAS_TARDANZA dias_
+   UNIFORM 1 0 1 r
+   IF r < 0.30
+      dias_ = 1
+   ELSEIF r < 0.70
+      dias_ = 2
+   ELSE
+      dias_ = 3
+   END
+END
+
 NEWCMD REORDENAR bandera_orden dias_orden total_ordenes_ llego_pedido_
    llego_pedido_ = 0
    IF bandera_orden = 1 'hay una orden
@@ -33,7 +44,7 @@ NEWCMD REORDENAR bandera_orden dias_orden total_ordenes_ llego_pedido_
       END
    ELSE 'generar una orden con el tiempo de entrega respectivo
       bandera_orden = 1 'pido la orden
-      dias_orden = 3 'REVISAR
+      GENERAR_DIAS_TARDANZA dias_orden
       total_ordenes_ = total_ordenes_ + 1
    END
 END
@@ -51,11 +62,7 @@ NEWCMD SIMULAR_DIA inventario_inicial cantidad_ordenar punto_reorden bandera_ord
    inventario_inicial = inventario_inicial - venta_ 'Disminuir el inventario del dia con la demanda.
 END
 
-NEWCMD SIMULAR_PERIODO periodo dias_ inventarios_iniciales_ ordenes_ dias_ordenes_ inventarios_finales_ ventas_ total_costo_inventario_ total_costo_faltantes_ total_costo_ordenes_
-   /* Iniciar en el día 1 con la cantidad de “q” unidades.*/
-   q = 50 'cantidad por ordenar
-   r = 20 'punto de reorden
-   i = q 'inventario inicial
+NEWCMD SIMULAR_PERIODO q r i periodo dias_ inventarios_iniciales_ ordenes_ dias_ordenes_ inventarios_finales_ ventas_ total_costo_inventario_ total_costo_faltantes_ total_costo_ordenes_
    
    bandera_orden = 0
    dias_orden = 0
@@ -82,7 +89,12 @@ END
 CLEAROUTPUT
 periodo = 365
 
-SIMULAR_PERIODO periodo dia inventario_inicial hay_pedido dias_pedido inventario_final demanda total_costo_inventario total_costo_faltantes total_costo_ordenes
+/* Iniciar en el día 1 con la cantidad de “q” unidades.*/
+q = 50 'cantidad por ordenar
+r = 20 'punto de reorden
+i = q 'inventario inicial
+
+SIMULAR_PERIODO q r i periodo dia inventario_inicial hay_pedido dias_pedido inventario_final demanda total_costo_inventario total_costo_faltantes total_costo_ordenes
 PRINT TABLE dia%4.0F inventario_inicial%16.0F hay_pedido%8.0F dias_pedido%8.0F demanda%8.0F inventario_final%4.0F
 PRINT
 costo_total = total_costo_inventario + total_costo_faltantes + total_costo_ordenes
