@@ -1,0 +1,83 @@
+/***********************************************************************************************
+Tarea 9 - Inventarios
+
+Kevin Fallas Alvarado 2019057752
+Esteban Madrigal Marin 2018154123
+************************************************************************************************
+
+/**************************     COSTOS    ***************************************************/
+/*al final del dia*/
+NEWCMD COSTO_INVENTARIO inventarios costo_inventario_
+END
+
+NEWCMD CALCULAR_PENALIZACION inventario costo_penalizacion_
+   costo_penalizacion_ = 50 * abs(inventario)
+   IF inventario > 0
+      costo_penalizacion_ = 0
+   END
+END
+
+NEWCMD COSTO_ORDEN total_ordenes costo_
+   costo_ = 100 * total_ordenes
+END
+
+/**************************     VENTAS    ***************************************************/
+NEWCMD CALCULAR_DEMANDA demanda_
+   POISSON 1 7 demanda_
+END
+
+NEWCMD REORDENAR bandera_orden dias_orden llego_pedido_
+   llego_pedido_ = 0
+   IF bandera_orden = 1 'hay una orden
+      dias_orden = dias_orden - 1
+      IF dias_orden = 0 'ya la orden debio llegar
+         llego_pedido_ = 1 'indico que llego
+         bandera_orden = 0 'entonces ya no hay orden
+      END
+   ELSE 'generar una orden con el tiempo de entrega respectivo
+      bandera_orden = 1 'pido la orden
+      dias_orden = 3 'REVISAR
+   END
+END
+
+NEWCMD SIMULAR_DIA inventario_inicial cantidad_ordenar punto_reorden bandera_orden dias_orden costo_total venta_
+   IF punto_reorden > inventario_inicial 'Revisar si hay que reordenar
+      REORDENAR bandera_orden dias_orden llego_pedido
+      IF llego_pedido = 1 'si llego pedido
+         llego_pedido = 0 'recibido
+         inventario_inicial = inventario_inicial + cantidad_ordenar 'suministre y guarde el resto
+      END
+   END
+   CALCULAR_DEMANDA venta_ 'Generar la demanda del día.
+   inventario_inicial = inventario_inicial - venta_ 'Disminuir el inventario del dia con la demanda.
+END
+
+NEWCMD SIMULAR_PERIODO periodo dias_ inventarios_iniciales_ ordenes_ dias_ordenes_ inventarios_finales_ ventas_ total_ordenes_
+   /* Iniciar en el día 1 con la cantidad de “q” unidades.*/
+   q = 50 'cantidad por ordenar
+   r = 20 'punto de reorden
+   i = q 'inventario inicial
+   
+   bandera_orden = 0
+   dias_orden = 0
+
+   costo_total = 0
+   dia = 1
+   WHILE dia <= periodo 'repetir el proceso por 365 días
+      SCORE dia dias_
+      SCORE i inventarios_iniciales_
+      SIMULAR_DIA i q r bandera_orden dias_orden costo_total venta
+      SCORE venta ventas_
+      SCORE bandera_orden ordenes_
+      SCORE dias_orden dias_ordenes_
+      SCORE i inventarios_finales_
+      dia = dia + 1
+   END
+END
+
+/***** MAIN *****/
+CLEAROUTPUT
+
+periodo = 8
+SIMULAR_PERIODO periodo No ini qe t fin x
+PRINT TABLE No%2.0F ini%2.0F qe%2.0F t%2.0F x%2.0F fin%2.0F
