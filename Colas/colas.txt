@@ -66,11 +66,11 @@ NEWCMD SIMULAR
       IF evento = Inicio					'===SI INICIA=================================================
          OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida 		' obtenemos el tiempo de salida
          OBTENER_TIEMPO tiempo prom_entrada tiempo_sig_entrada 	' obtenemos el siguiente tiempo de entrada
-      ELSEIF evento = Entrad                                            '===SI ENTRA UN CAMION=========================================	
-         IF en_servicio = 1 					' si entra un camion pero hay uno en servicio
+      ELSEIF evento = Entrad                                            '===SI ENTRA UN CAMION=========================================
+         IF en_servicio = 1 					' si hay uno en servicio
             CONCAT cola 0 cola 				' lo encolo
          END
-         IF tiempo_sig_salida = xx 				' si no hay tiempo de salida
+         IF tiempo_sig_salida = xx 				' si no hay tiempo de salida (CREO QUE ESTO PODRIA SER UN ELSE)
             en_servicio = 1 					' es porque no hay nadie esperando, entonces metemos el servicio
             OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida 	' obtenemos el tiempo de salida
          END
