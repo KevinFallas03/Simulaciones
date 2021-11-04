@@ -13,23 +13,15 @@ GLOBAL Inicio Salida Entrad prom_salida prom_entrada xx
 
 /**************************     MOSTRAR DATOS    ***************************************************/
 NEWCMD SHOW_COLA cola
-   OUTPUT "      ("
+   OUTPUT "("
    FOREACH tiempo cola
       OUTPUT "%0.0f " tiempo
    END
    OUTPUT ") "
 END
 
-NEWCMD GENERAR_COLA_STRING cola
-   STRING "(" cola_string
-   FOREACH tiempo cola
-      STRING tiempo%1.0f " " cola_string cola_string
-   END
-   STRING ")" cola_string cola_string
-END
-
 NEWCMD SHOW_TABLE tiempo evento tiempo_sig_salida tiempo_sig_entrada cola tiempo_ocioso tiempo_espera
-   OUTPUT "%3.2f      %3.2f   %3.2f        %3.2f         %3.2f        %3.2f  " tiempo evento tiempo_sig_salida tiempo_sig_entrada tiempo_ocioso tiempo_espera
+   OUTPUT "%4.2f\t\t%8.2f\t\t%8.2f\t\t%8.2f\t\t%8.2f\t\t%8.2f\t\t" tiempo evento tiempo_sig_salida tiempo_sig_entrada tiempo_ocioso tiempo_espera
    SHOW_COLA cola
    PRINT
 END
@@ -52,9 +44,9 @@ newcmd OBTENER_TIEMPO tiempo_actual promedio tiempo_evento_
 end
 
 NEWCMD SIMULAR
-   PRINT "TIEMPO   EVENTO   SIG_SAL  SIG_ENT   OCIOSO   ESPERA    COLA "
+   PRINT "TIEMPO\t\tEVENTO\t\tSIG_SAL\t\tSIG_ENT\t\tOCIOSO\t\tESPERA\t\tCOLA"
    tiempo_sig_entrada = 0
-   tiempo_sig_salida = 0
+   tiempo_sig_salida = xx
    tiempo_ocioso = 0
    tiempo_espera = 0
    tiempo = 0
@@ -63,7 +55,9 @@ NEWCMD SIMULAR
    en_servicio = 1
    REPEAT 20
       IF evento = Inicio					'===SI INICIA=================================================
-         OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida 		' obtenemos el tiempo de salida
+         IF en_servicio = 1					' si hay alguien en espera
+            OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida 	' obtenemos el tiempo de salida
+         END
          OBTENER_TIEMPO tiempo prom_entrada tiempo_sig_entrada 	' obtenemos el siguiente tiempo de entrada
       ELSEIF evento = Entrad                                            '===SI ENTRA UN CAMION=========================================
          IF en_servicio = 1 					' si hay uno en servicio
