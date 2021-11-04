@@ -9,8 +9,7 @@ Esteban Madrigal Marin 2018154123
 NAME Inicio Salida Entrad xx
 prom_salida = 40 'DEPENDE DEL NUMERO DE EMPELADOS
 prom_entrada = 40
-STRING "" cola_string
-GLOBAL Inicio Salida Entrad prom_salida prom_entrada xx cola_string
+GLOBAL Inicio Salida Entrad prom_salida prom_entrada xx
 
 /**************************     MOSTRAR DATOS    ***************************************************/
 NEWCMD SHOW_COLA cola
@@ -37,10 +36,10 @@ END
 
 /**************************     SIMULACION    ***************************************************/
 NEWCMD SET_SIG_EVENTO tiempo_sig_salida tiempo_sig_entrada tiempo evento
-   IF tiempo_sig_salida > tiempo_sig_entrada OR tiempo_sig_salida = xx 'VA LA SALIDA
+   IF tiempo_sig_salida > tiempo_sig_entrada OR tiempo_sig_salida = xx  'VA LA ENTRADA
       evento = Entrad
       tiempo = tiempo_sig_entrada
-   ELSE				    'VA LA ENTRADA
+   ELSE				     			'VA LA SALIDA
       evento = Salida
       tiempo = tiempo_sig_salida
    END
@@ -68,9 +67,8 @@ NEWCMD SIMULAR
          OBTENER_TIEMPO tiempo prom_entrada tiempo_sig_entrada 	' obtenemos el siguiente tiempo de entrada
       ELSEIF evento = Entrad                                            '===SI ENTRA UN CAMION=========================================
          IF en_servicio = 1 					' si hay uno en servicio
-            CONCAT cola 0 cola 				' lo encolo
-         END
-         IF tiempo_sig_salida = xx 				' si no hay tiempo de salida (CREO QUE ESTO PODRIA SER UN ELSE)
+            SCORE 0 cola 					' lo encolo
+         ELSE 						' si no hay tiempo de salida (CREO QUE ESTO PODRIA SER UN ELSE)
             en_servicio = 1 					' es porque no hay nadie esperando, entonces metemos el servicio
             OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida 	' obtenemos el tiempo de salida
          END
@@ -93,4 +91,3 @@ END
 /***** MAIN *****/
 CLEAROUTPUT
 SIMULAR
-
