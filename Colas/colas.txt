@@ -6,10 +6,10 @@ Esteban Madrigal Marin 2018154123
 ************************************************************************************************/
 
 /**************************     VARIABLES GLOBALES    ***************************************************/
-NAME Inicio Salida Entrad xx
+NAME Inicio Salida Entrada xx
 prom_salida = 40 'DEPENDE DEL NUMERO DE EMPELADOS
 prom_entrada = 40
-GLOBAL Inicio Salida Entrad prom_salida prom_entrada xx
+GLOBAL Inicio Salida Entrada prom_salida prom_entrada xx
 
 /**************************     MOSTRAR DATOS    ***************************************************/
 NEWCMD SHOW_COLA cola
@@ -29,11 +29,19 @@ END
 /**************************     SIMULACION    ***************************************************/
 NEWCMD SET_SIG_EVENTO tiempo_sig_salida tiempo_sig_entrada tiempo evento
    IF tiempo_sig_salida > tiempo_sig_entrada OR tiempo_sig_salida = xx  'VA LA ENTRADA
-      evento = Entrad
+      evento = Entrada
       tiempo = tiempo_sig_entrada
    ELSE				     			'VA LA SALIDA
       evento = Salida
       tiempo = tiempo_sig_salida
+   END
+END
+
+NEWCMD ACTUALIZAR_COLA cola tiempo_espera cola_nueva_
+   cola_nueva_ = ()
+   FOREACH tiempo cola
+      tiempo_nuevo = tiempo + tiempo_espera
+      SCORE tiempo_nuevo cola_nueva_
    END
 END
 
@@ -50,19 +58,24 @@ NEWCMD SIMULAR
    tiempo_ocioso = 0
    tiempo_espera = 0
    tiempo = 0
+   tiempo_anterior = 0
    evento = Inicio
    cola = ()
    en_servicio = 1
    REPEAT 20
+      tiempo_ocioso = 0
       IF evento = Inicio					'===SI INICIA=================================================
          IF en_servicio = 1					' si hay alguien en espera
             OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida 	' obtenemos el tiempo de salida
          END
          OBTENER_TIEMPO tiempo prom_entrada tiempo_sig_entrada 	' obtenemos el siguiente tiempo de entrada
-      ELSEIF evento = Entrad                                            '===SI ENTRA UN CAMION=========================================
+      ELSEIF evento = Entrada                                            '===SI ENTRA UN CAMION=========================================
          IF en_servicio = 1 					' si hay uno en servicio
+            tiempo_espera = tiempo - tiempo_anterior
+            ACTUALIZAR_COLA cola tiempo_espera cola
             SCORE 0 cola 					' lo encolo
-         ELSE 						' si no hay tiempo de salida (CREO QUE ESTO PODRIA SER UN ELSE)
+         ELSE 						' si no hay tiempo de salida
+            tiempo_ocioso = tiempo - tiempo_anterior
             en_servicio = 1 					' es porque no hay nadie esperando, entonces metemos el servicio
             OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida 	' obtenemos el tiempo de salida
          END
@@ -74,11 +87,13 @@ NEWCMD SIMULAR
             tiempo_sig_salida = xx 				' no se requiere salida
          ELSE 						' si hay camion esperando
             REMOVE cola 1 cola 				' lo sacamos de la cola
+            tiempo_espera = tiempo - tiempo_anterior
             OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida 	' obtenemos el tiempo de salida
             en_servicio = 1 					' lo ponemos en servicio
          END
       END
       SHOW_TABLE tiempo evento tiempo_sig_salida tiempo_sig_entrada cola tiempo_ocioso tiempo_espera
+      tiempo_anterior = tiempo
       SET_SIG_EVENTO tiempo_sig_salida tiempo_sig_entrada tiempo evento
    END
 END
