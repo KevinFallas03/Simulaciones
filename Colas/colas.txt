@@ -7,9 +7,10 @@ Esteban Madrigal Marin 2018154123
 
 /**************************     VARIABLES GLOBALES    ***************************************************/
 NAME Inicio Salida Entrad xx
-prom_salida = 40
+prom_salida = 40 'DEPENDE DEL NUMERO DE EMPELADOS
 prom_entrada = 40
-GLOBAL Inicio Salida Entrad prom_salida prom_entrada xx
+STRING "" cola_string
+GLOBAL Inicio Salida Entrad prom_salida prom_entrada xx cola_string
 
 /**************************     MOSTRAR DATOS    ***************************************************/
 NEWCMD SHOW_COLA cola
@@ -20,9 +21,18 @@ NEWCMD SHOW_COLA cola
    OUTPUT ") "
 END
 
+NEWCMD GENERAR_COLA_STRING cola
+   STRING "(" cola_string
+   FOREACH tiempo cola
+      STRING tiempo%1.0f " " cola_string cola_string
+   END
+   STRING ")" cola_string cola_string
+END
+
 NEWCMD SHOW_TABLE tiempo evento tiempo_sig_salida tiempo_sig_entrada cola tiempo_ocioso tiempo_espera
    OUTPUT "%3.2f      %3.2f   %3.2f        %3.2f         %3.2f        %3.2f  " tiempo evento tiempo_sig_salida tiempo_sig_entrada tiempo_ocioso tiempo_espera
    SHOW_COLA cola
+   PRINT
 END
 
 /**************************     SIMULACION    ***************************************************/
@@ -53,32 +63,31 @@ NEWCMD SIMULAR
    cola = ()
    en_servicio = 1
    REPEAT 20
-      IF evento = Inicio
-         OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida ' obtenemos el tiempo de salida
-         OBTENER_TIEMPO tiempo prom_entrada tiempo_sig_entrada ' obtenemos el siguiente tiempo de entrada
-      ELSEIF evento = Entrad
-         IF en_servicio = 1 ' si entra un camion pero hay uno en servicio 
-            CONCAT cola 0 cola ' lo encolo
+      IF evento = Inicio					'===SI INICIA=================================================
+         OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida 		' obtenemos el tiempo de salida
+         OBTENER_TIEMPO tiempo prom_entrada tiempo_sig_entrada 	' obtenemos el siguiente tiempo de entrada
+      ELSEIF evento = Entrad                                            '===SI ENTRA UN CAMION=========================================	
+         IF en_servicio = 1 					' si entra un camion pero hay uno en servicio
+            CONCAT cola 0 cola 				' lo encolo
          END
-         IF tiempo_sig_salida = xx ' si no hay tiempo de salida
-            en_servicio = 1 ' es porque no hay nadie esperando, entonces metemos el servicio
-            OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida ' obtenemos el tiempo de salida
+         IF tiempo_sig_salida = xx 				' si no hay tiempo de salida
+            en_servicio = 1 					' es porque no hay nadie esperando, entonces metemos el servicio
+            OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida 	' obtenemos el tiempo de salida
          END
-         OBTENER_TIEMPO tiempo prom_entrada tiempo_sig_entrada ' obtenemos el siguiente tiempo de entrada
-      ELSEIF evento = Salida
+         OBTENER_TIEMPO tiempo prom_entrada tiempo_sig_entrada 	' obtenemos el siguiente tiempo de entrada
+      ELSEIF evento = Salida                                            '===SI SALE UN CAMION=================================================
          SIZE cola en_espera
-         IF en_espera = 0 ' no hay nadie esperando
-            en_servicio = 0 ' no hay nadie en servicio
-            tiempo_sig_salida = xx ' no se requiere salida
-         ELSE ' si hay camion esperando
-            REMOVE cola 1 cola ' lo sacamos de la cola
-            OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida ' obtenemos el tiempo de salida
-            en_servicio = 1 ' lo ponemos en servicio
+         IF en_espera = 0 					' si no hay nadie esperando entonces
+            en_servicio = 0 					' no hay nadie en servicio
+            tiempo_sig_salida = xx 				' no se requiere salida
+         ELSE 						' si hay camion esperando
+            REMOVE cola 1 cola 				' lo sacamos de la cola
+            OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida 	' obtenemos el tiempo de salida
+            en_servicio = 1 					' lo ponemos en servicio
          END
       END
       SHOW_TABLE tiempo evento tiempo_sig_salida tiempo_sig_entrada cola tiempo_ocioso tiempo_espera
       SET_SIG_EVENTO tiempo_sig_salida tiempo_sig_entrada tiempo evento
-      PRINT
    END
 END
 /***** MAIN *****/
