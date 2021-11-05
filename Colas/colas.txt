@@ -136,7 +136,7 @@ NEWCMD SIMULAR prom_salida
       tiempo_espera = 0
       SET_SIG_EVENTO tiempo_sig_salida tiempo_sig_entrada tiempo evento
    END
-   DESENCOLAR_CAMIONES cola tiempo tiempo_anterior evento tiempo_sig_entrada tiempo_ocioso prom_salida en_servicio
+   DESENCOLAR_CAMIONES cola tiempo tiempo_anterior evento tiempo_sig_entrada tiempo_ocioso prom_salida
 END
 /***** MAIN *****/
 CLEAROUTPUT
