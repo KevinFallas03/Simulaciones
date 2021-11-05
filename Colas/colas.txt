@@ -24,7 +24,7 @@ NEWCMD SHOW_COLA cola
    OUTPUT ") "
 END
 
-NEWCMD SHOW_TABLE tiempo evento tiempo_sig_salida tiempo_sig_entrada cola tiempo_ocioso tiempo_espera
+NEWCMD SHOW_LINE tiempo evento tiempo_sig_salida tiempo_sig_entrada cola tiempo_ocioso tiempo_espera
    OUTPUT "%4.2f\t\t%8.2f\t\t%8.2f\t\t%8.2f\t\t%8.2f\t\t%8.2f\t\t" tiempo evento tiempo_sig_salida tiempo_sig_entrada tiempo_ocioso tiempo_espera
    SHOW_COLA cola
    PRINT
@@ -90,7 +90,7 @@ NEWCMD DESENCOLAR_CAMIONES cola tiempo tiempo_anterior evento tiempo_sig_entrada
          tiempo_espera = tiempo - tiempo_entrada			' sacamos cuanto lleva esperando
          OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida 		' obtenemos el tiempo de salida
          'en_servicio = 1 					' lo ponemos en servicio
-         SHOW_TABLE tiempo evento tiempo_sig_salida tiempo_sig_entrada cola tiempo_ocioso tiempo_espera
+         SHOW_LINE tiempo evento tiempo_sig_salida tiempo_sig_entrada cola tiempo_ocioso tiempo_espera
          tiempo_anterior = tiempo
          tiempo = tiempo_sig_salida
       END
@@ -147,7 +147,7 @@ NEWCMD SIMULAR
          tiempo_espera_cola = tiempo - tiempo_anterior		' sacamos el tiempo que lleva en la cola desde el ultimo tiempo
          ACTUALIZAR_COLA cola tiempo_espera_cola			' actualizamos colas
       END
-      SHOW_TABLE tiempo evento tiempo_sig_salida tiempo_sig_entrada cola tiempo_ocioso tiempo_espera
+      SHOW_LINE tiempo evento tiempo_sig_salida tiempo_sig_entrada cola tiempo_ocioso tiempo_espera
       tiempo_anterior = tiempo
       tiempo_ocioso = 0
       tiempo_espera = 0
