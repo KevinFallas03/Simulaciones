@@ -1,51 +1,21 @@
-INCLUDE "D:/TEC/2021/S2/Simulacion/Simulaciones/Inventarios/inventarios.txt"
+INCLUDE "D:/TEC/2021/S2/Simulacion/Simulaciones/Colas/colas.txt"
 CLEAROUTPUT
 
-NEWCMD SIMULAR_N n q r prom_costo_total_
-   prom_costo_total_ = 0
-   REPEAT n
-      i = 50
-      periodo = 365
-      SIMULAR_PERIODO q r i periodo dia inventario_inicial hay_pedido dias_pedido inventario_final demanda total_costo_inventario total_costo_faltantes total_costo_ordenes
-      prom_costo_total_ = prom_costo_total_ + total_costo_faltantes + total_costo_inventario + total_costo_ordenes
-   END
-   prom_costo_total_ = prom_costo_total_/n
-END
-
-NEWCMD GENERAR_TABLA
-   list_r = (10 20 30 40 50 60 70 80 90 100)
-   list_q = (100 90 80 70 60 50 40 30 20 10)
-   best = (0 0 0)
-   NEWARRAY tabla 10 10
-   row = 1
-   OUTPUT "%10.5F | " 0
-   FOREACH num list_r
-      OUTPUT "%10.5F | " num
-   END
-   FOREACH q list_q
-      print "\n---------------------------------------------------------------------------------------------------------------------------------------"
-      OUTPUT "%10.5F | " q
-      col = 1
-      FOREACH r list_r
-         IF r <= q
-            SIMULAR_N 100 q r promedio
-            OUTPUT "%10.5F | " promedio
-            tabla[row][col] = promedio
-            TAKE best 1 mejor
-            IF promedio < mejor OR mejor = 0
-               PUT promedio 1 best
-               PUT q 2 best
-               PUT r 3 best
-            END
-         ELSE
-            tabla[row][col] = 0
-            OUTPUT "%10.5F | " 0
-         END
-         col = col+1
+NEWCMD GENERAR_TABLA list_empleados promedios_
+   cantidad_simulaciones = 10
+   FOREACH cantidad_empleados list_empleados
+      costos_simulacion = ()
+      REPEAT cantidad_simulaciones
+         OBTENER_MEDIA_TIEMPO cantidad_empleados prom_salida
+         SIMULAR prom_salida costo_total_
+         SCORE costo_total_ costos_simulacion
       END
-      row = row+1
+      SUM costos_simulacion suma_costos
+      promedio = suma_costos/cantidad_simulaciones
+      SCORE promedio promedios_
    END
-   PRINT
-   PRINT best
+   
 END
-GENERAR_TABLA
+list_empleados = (3 4 5 6)
+GENERAR_TABLA list_empleados promedios
+PRINT TABLE list_empleados promedios
