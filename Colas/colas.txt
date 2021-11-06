@@ -7,18 +7,28 @@ Esteban Madrigal Marin 2018154123
 
 /**************************     VARIABLES GLOBALES    ***************************************************/
 'INPUT emplados
-NAME Inicio Salida Entrada Fin x
+NAME Inicio Salida Entrada Fin x Salarios Tiempo_extra Almacen Ocioso Espera Total
+lista_nombre_costos = (Salarios Tiempo_extra Almacen Ocioso Espera Total)
 prom_entrada = 40
-tiempo_maximo = 480
+tiempo_maximo = 48
+salario = 25
+cantidad_empleados = 0
+salario_tiempo_extra = 37.50
+costo_espera = 100
+costo_ocio = 25
+costo_almacen = 500
 prom_salidas = (37 35 33 31)
-GLOBAL Inicio Salida Entrada Fin prom_entrada x prom_salidas tiempo_maximo
+GLOBAL Inicio Salida Entrada Fin prom_entrada x prom_salidas tiempo_maximo salario salario_tiempo_extra costo_ocio costo_espera costo_almacen cantidad_empleados lista_nombre_costos
 
 /**************************     MOSTRAR DATOS    ***************************************************/
 NEWCMD SHOW_LINE tiempo evento tiempo_sig_salida tiempo_sig_entrada cola tiempo_ocioso tiempo_espera
    OUTPUT "%4.2f\t\t%8.2f\t\t%8.2f\t\t%8.2f\t\t%8.2f\t\t%8.2f\t\t" tiempo evento tiempo_sig_salida tiempo_sig_entrada tiempo_ocioso tiempo_espera
    WRITE window rows cola%1.2f
 END
-
+NEWCMD SHOW_COSTOS lista_costos
+   PRINT "\n\n=== DETALLE DE COSTOS ===\nConcepto\tCosto\n------------------------------"
+   WRITE window lista_nombre_costos lista_costos%1.5f
+END
 /**************************     SIMULACION    ***************************************************/
 NEWCMD SET_SIG_EVENTO tiempo_sig_salida tiempo_sig_entrada tiempo evento
    IF tiempo_sig_salida > tiempo_sig_entrada OR tiempo_sig_salida = x  'VA LA ENTRADA
@@ -60,8 +70,8 @@ NEWCMD OBTENER_CAMIONES_ESPERA cantidad_camiones_
    END
 END
 
-NEWCMD DESENCOLAR_CAMIONES cola tiempo tiempo_anterior evento tiempo_sig_entrada tiempo_ocioso prom_salida
-   PRINT "============================= TIEMPO EXCEDIDO: DESENCOLANDO CAMIONES | NO MÁS ENTRADAS ==============================================="
+NEWCMD DESENCOLAR_CAMIONES cola tiempo tiempo_anterior evento tiempo_sig_entrada tiempo_ocioso prom_salida tiempo_espera_acumulado
+   PRINT "============================= TIEMPO EXCEDIDO: DESENCOLANDO CAMIONES | NO M?S ENTRADAS ==============================================="
    SIZE cola en_espera
    evento = Salida
    REPEAT en_espera
@@ -69,16 +79,42 @@ NEWCMD DESENCOLAR_CAMIONES cola tiempo tiempo_anterior evento tiempo_sig_entrada
       tiempo_entrada = tiempo_anterior - tiempo_duracion		' tiempo en el que entro el camion
       REMOVE cola 1 cola 					' lo sacamos de la cola
       tiempo_espera = tiempo - tiempo_entrada			' sacamos cuanto lleva esperando
+      tiempo_espera_acumulado = tiempo_espera_acumulado + tiempo_espera
       OBTENER_TIEMPO tiempo prom_salida tiempo_sig_salida 		' obtenemos el tiempo de salida
-      'en_servicio = 1 					' lo ponemos en servicio
       SHOW_LINE tiempo evento tiempo_sig_salida tiempo_sig_entrada cola tiempo_ocioso tiempo_espera
       tiempo_anterior = tiempo
       tiempo = tiempo_sig_salida
    END
-   OUTPUT "%4.2f\t\t" tiempo Fin
 END
 
-NEWCMD CALCULAR_COSTOS
+/**************************     COSTOS    ***************************************************/
+NEWCMD CALCULAR_COSTO_SALARIO cantidad_empleados tiempo lista_costos costo_salario_
+   costo_salario_ = cantidad_empleados * salario * (tiempo/60)
+   SCORE costo_salario_ lista_costos
+END
+
+NEWCMD CALCULAR_COSTO_SALARIO_TIEMPO_EXTRA cantidad_empleados tiempo_final lista_costos costo_salario_extra_
+   tiempo_extra = tiempo_final - tiempo_maximo
+   costo_salario_extra_ = cantidad_empleados * salario_tiempo_extra * (tiempo_extra/60)
+   SCORE costo_salario_extra_ lista_costos
+END
+
+NEWCMD CALCULAR_COSTO_TIEMPO_ESPERA tiempo_espera_acumulado lista_costos costo_tiempo_espera_
+   costo_tiempo_espera_ = costo_espera * (tiempo_espera_acumulado/60)
+   SCORE costo_tiempo_espera_ lista_costos
+END
+
+NEWCMD CALCULAR_COSTO_TIEMPO_OCIOSO cantidad_empleados tiempo_ocioso_acumulado lista_costos costo_tiempo_ocioso_
+   costo_tiempo_ocioso_ = cantidad_empleados * costo_ocio * (tiempo_ocioso_acumulado/60)
+   SCORE costo_tiempo_ocioso_ lista_costos
+END
+NEWCMD CALCULAR_COSTO_ALMACEN tiempo lista_costos costo_operacion_almacen_
+   costo_operacion_almacen_ = costo_almacen * (tiempo/60)
+   SCORE costo_operacion_almacen_ lista_costos
+END
+NEWCMD CALCULAR_COSTOS_TOTAL costo_operacion_almacen costo_tiempo_ocioso costo_tiempo_espera costo_salario_extra costo_salario lista_costos costo_total_
+   costo_total_ = costo_operacion_almacen + costo_tiempo_ocioso + costo_tiempo_espera + costo_salario_extra + costo_salario
+   SCORE costo_total_ lista_costos
 END
 
 NEWCMD SIMULAR prom_salida
@@ -86,7 +122,9 @@ NEWCMD SIMULAR prom_salida
    tiempo_sig_entrada = 0
    tiempo_sig_salida = x
    tiempo_ocioso = 0
+   tiempo_ocioso_acumulado = 0
    tiempo_espera = 0
+   tiempo_espera_acumulado = 0
    tiempo = 0
    tiempo_anterior = 0
    evento = Inicio
@@ -132,12 +170,31 @@ NEWCMD SIMULAR prom_salida
       END
       SHOW_LINE tiempo evento tiempo_sig_salida tiempo_sig_entrada cola tiempo_ocioso tiempo_espera
       tiempo_anterior = tiempo
+      tiempo_ocioso_acumulado = tiempo_ocioso_acumulado+tiempo_ocioso
+      tiempo_espera_acumulado = tiempo_espera_acumulado+tiempo_espera
       tiempo_ocioso = 0
       tiempo_espera = 0
       SET_SIG_EVENTO tiempo_sig_salida tiempo_sig_entrada tiempo evento
    END
-   DESENCOLAR_CAMIONES cola tiempo tiempo_anterior evento tiempo_sig_entrada tiempo_ocioso prom_salida
+   lista_costos = ()
+   costo_salario_extra = 0
+   SIZE cola en_espera
+   IF en_espera > 0
+      CALCULAR_COSTO_SALARIO cantidad_empleados tiempo_maximo lista_costos costo_salario
+      DESENCOLAR_CAMIONES cola tiempo tiempo_anterior evento tiempo_sig_entrada tiempo_ocioso prom_salida tiempo_espera_acumulado
+      CALCULAR_COSTO_SALARIO_TIEMPO_EXTRA cantidad_empleados tiempo lista_costos costo_salario_extra
+   ELSE
+      CALCULAR_COSTO_SALARIO cantidad_empleados tiempo lista_costos costo_salario
+      SCORE 0 lista_costos
+   END
+   CALCULAR_COSTO_ALMACEN tiempo lista_costos costo_operacion_almacen 'ES TIEMPO MAXIMO O TIEMPO NORMAL??????
+   CALCULAR_COSTO_TIEMPO_OCIOSO cantidad_empleados tiempo_ocioso_acumulado lista_costos costo_tiempo_ocioso
+   CALCULAR_COSTO_TIEMPO_ESPERA tiempo_espera_acumulado lista_costos costo_tiempo_espera
+   OUTPUT "%4.2f\t\t" tiempo Fin
+   CALCULAR_COSTOS_TOTAL costo_operacion_almacen costo_tiempo_ocioso costo_tiempo_espera costo_salario_extra costo_salario lista_costos costo_total_
+   SHOW_COSTOS lista_costos
 END
+
 /***** MAIN *****/
 CLEAROUTPUT
 'INPUT "Digite la cantidad de los empleados(3, 4, 5, 6): " cantidad_empleados
